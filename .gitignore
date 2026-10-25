@@ -3,6 +3,8 @@ dist/
 out/
 release/
 artifacts/
+.dsh-office-*/
+docs/deck-assets/
 *.log
 *.bak
 *.tmp

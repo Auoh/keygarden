@@ -7,6 +7,8 @@
 ![键息花园在桌面角落](docs/screenshots/desktop.png)
 
 > 截图使用演示数据。悬浮窗是透明、置顶、鼠标穿透的；实际运行时它只占屏幕右下角一小块。
+>
+> 体验流程与下一版改版提案（PPT）：[keygarden-A-flow.pptx](docs/keygarden-A-flow.pptx)
 
 ## 现在是什么状态
 
