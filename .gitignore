@@ -5,6 +5,7 @@ release/
 artifacts/
 .dsh-office-*/
 docs/deck-assets/
+docs/modern-assets/
 *.log
 *.bak
 *.tmp

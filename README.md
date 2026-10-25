@@ -6,7 +6,7 @@
 
 ![键息花园在桌面角落](docs/screenshots/desktop.png)
 
-> 截图使用演示数据。悬浮窗是透明、置顶、鼠标穿透的；实际运行时它只占屏幕右下角一小块。
+> 截图使用演示数据。悬浮窗是透明、桌面层、鼠标穿透的；实际运行时它只占屏幕右下角一小块。
 >
 > 体验流程与下一版改版提案（PPT）：[keygarden-A-flow.pptx](docs/keygarden-A-flow.pptx)
 
@@ -35,9 +35,10 @@ B/C 的完整概念图：[B 桌边远行](concepts/b.jpg) · [C 键盘小镇](co
 
 ## 功能
 
-- 透明、置顶、鼠标穿透的桌面悬浮窗，不抢焦点
+- 透明、桌面层、鼠标穿透的桌面悬浮窗，不抢焦点
 - 全局键盘节奏采集（只读键类与时间，不读字符）
-- 天气、昼夜、植物生长、萤火虫、蜗牛、雨水与池塘动画
+- 5 阶段生态瓶照片随打字生长，按键触发一次轻微脉冲与孢子
+- 天气、昼夜、植物生长、萤火虫、雨水与池塘动画
 - 每日总结与明信片，保留最近 90 天
 - 系统托盘：打开手帐、显示/隐藏花园、暂停、开机启动、退出
 - 全局快捷键
@@ -45,6 +46,15 @@ B/C 的完整概念图：[B 桌边远行](concepts/b.jpg) · [C 键盘小镇](co
 - 游戏模式选择器：A 已开放，B/C 预留
 - 自动锁屏/休眠暂停观察器
 - 单元测试覆盖节奏分类、日切、成长、明信片、上限
+
+## 生长画面素材
+
+悬浮窗使用 5 张 2:3 的生态瓶照片做阶段交叉淡化，打字越久，花园越往后一阶段。当前仓库里是 Pexels 的占位图；替换成自己的图不需要改代码。
+
+- 放到：`src/renderer/overlay/assets/garden/light/stage-0.jpg` … `stage-4.jpg`（或 `dark/`）
+- 规格与提示词：[docs/garden-image-prompts.md](docs/garden-image-prompts.md)
+- 素材说明：[src/renderer/overlay/assets/garden/README.md](src/renderer/overlay/assets/garden/README.md)
+- 只做一套主题也可以；两套都有时默认浅色
 
 ## 快速开始
 
@@ -119,7 +129,7 @@ Electron main process
   ├─ KeyObserver       管理观察器进程、掉线重启、暂停
   ├─ GameEngine        节奏分类、植物成长、日切、明信片
   ├─ StateStore        本地 JSON 原子写入
-  ├─ Overlay window    透明置顶、鼠标穿透、Canvas 动画
+  ├─ Overlay window    透明桌面层、鼠标穿透、5 阶段照片生长
   └─ Journal window    手帐 / 明信片 / 模式选择 / 设置
 ```
 

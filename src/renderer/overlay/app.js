@@ -1,4 +1,4 @@
-/* global window, document, GardenCanvas */
+/* global window, document, PhotoGarden */
 (() => {
   const bridge = window.keygardenOverlay;
   const canvas = document.getElementById("garden");
@@ -13,7 +13,12 @@
   const pauseHint = document.getElementById("pauseHint");
   const postcardDot = document.getElementById("postcardDot");
 
-  const garden = GardenCanvas.create(canvas);
+  const garden = PhotoGarden.create(canvas, {
+    onTheme(theme) {
+      document.body.dataset.theme = theme;
+      card.dataset.theme = theme;
+    },
+  });
   let current = null;
 
   function fallbackDemoState() {
@@ -40,6 +45,7 @@
       hasNewPostcard: true,
       weather: { key: "rain", label: "微雨", detail: "雨声很轻" },
       plants,
+      lastInput: null,
       runtime: { autoPaused: false, capture: { healthy: true } },
     };
   }
@@ -110,6 +116,7 @@
         ...demo,
         clock: new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" }),
         intensity,
+        lastInput: { category: phase % 3 === 0 ? "punct" : "letter", at: Date.now() },
         weather: {
           key: intensity > 0.4 ? "rain" : intensity > 0.1 ? "breeze" : "calm",
           label: intensity > 0.4 ? "骤雨" : intensity > 0.1 ? "微雨" : "等风",

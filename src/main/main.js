@@ -46,7 +46,7 @@ let fastBroadcastTimer = null;
 let hotkeyStatus = {};
 let captureTimer = null;
 
-const gotLock = app.requestSingleInstanceLock();
+const gotLock = process.env.KEYGARDEN_CAPTURE === "1" ? true : app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
 } else {
@@ -144,8 +144,8 @@ function scheduleSave() {
 function positionOverlay() {
   if (!overlayWindow || overlayWindow.isDestroyed()) return;
   const display = screen.getPrimaryDisplay();
-  const width = 430;
-  const height = 580;
+  const width = 260;
+  const height = 320;
   const x = Math.round(display.workArea.x + display.workArea.width - width - 16);
   const y = Math.round(display.workArea.y + display.workArea.height - height - 16);
   overlayWindow.setBounds({ x, y, width, height });
@@ -153,8 +153,8 @@ function positionOverlay() {
 
 function createOverlayWindow() {
   overlayWindow = new BrowserWindow({
-    width: 430,
-    height: 580,
+    width: 260,
+    height: 320,
     show: false,
     transparent: true,
     backgroundColor: "#00000000",
@@ -166,7 +166,7 @@ function createOverlayWindow() {
     fullscreenable: false,
     skipTaskbar: true,
     focusable: false,
-    alwaysOnTop: true,
+    alwaysOnTop: false,
     hasShadow: false,
     acceptFirstMouse: false,
     webPreferences: {
@@ -179,8 +179,7 @@ function createOverlayWindow() {
   });
 
   overlayWindow.setMenuBarVisibility(false);
-  overlayWindow.setAlwaysOnTop(true, "floating");
-  overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: false });
+  overlayWindow.setVisibleOnAllWorkspaces(false);
   overlayWindow.setIgnoreMouseEvents(true, { forward: true });
   overlayWindow.webContents.on("did-finish-load", () => sendOverlayState());
   overlayWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));

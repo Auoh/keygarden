@@ -39,6 +39,8 @@ test("typing feeds categories, rhythm and a visual pulse", () => {
   assert.ok(snapshot.intensity > 0.5);
   assert.ok(snapshot.plants.some((plant) => plant.growth > 0.5));
   assert.ok(["rain", "breeze"].includes(snapshot.weather.key));
+  assert.equal(snapshot.lastInput.category, "punct");
+  assert.equal(snapshot.lastInput.at, start + 41 * 250);
 });
 
 test("day rollover grows the garden and creates an unseen postcard", () => {

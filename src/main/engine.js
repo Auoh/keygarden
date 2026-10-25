@@ -108,6 +108,7 @@ class GameEngine {
     this.now = now;
     this.state = normalizeState(state, this.now());
     this.recentKeys = [];
+    this.lastInput = null;
     this.ensureToday(this.now());
   }
 
@@ -274,6 +275,7 @@ class GameEngine {
     if (day.firstKeyAt === null) day.firstKeyAt = timestamp;
     day.lastKeyAt = timestamp;
     this.state.meta.totalKeys += 1;
+    this.lastInput = { category, at: timestamp };
 
     this.recentKeys.push(timestamp);
     if (this.recentKeys.length > 180) this.recentKeys.splice(0, this.recentKeys.length - 180);
@@ -332,6 +334,7 @@ class GameEngine {
       plants,
       intensity,
       idleMs,
+      lastInput: this.lastInput,
       weather,
       rhythmPreview: rhythm,
       today: {
