@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>概念 A · 键息花园</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .work { top: 220px; width: 820px; height: 580px; }
+
+  .garden-card {
+    position: absolute;
+    left: 962px;
+    top: 208px;
+    z-index: 26;
+    width: 414px;
+    height: 526px;
+    overflow: hidden;
+    border: 1px solid rgba(216, 255, 237, 0.14);
+    border-radius: 26px;
+    background: #07110f;
+    box-shadow:
+      0 36px 90px rgba(0, 0, 0, 0.62),
+      0 0 70px rgba(76, 155, 124, 0.11),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .garden-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 7;
+    pointer-events: none;
+    border-radius: 26px;
+    box-shadow:
+      inset 0 0 0 1px rgba(220, 255, 241, 0.07),
+      inset 0 -60px 80px rgba(2, 8, 6, 0.33);
+  }
+
+  .garden-art,
+  .garden-art svg {
+    display: block;
+    width: 414px;
+    height: 526px;
+  }
+
+  .glass-sheen {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    background:
+      linear-gradient(128deg, rgba(219, 255, 241, 0.09) 0%, rgba(219, 255, 241, 0.025) 20%, transparent 38%),
+      radial-gradient(240px 120px at 20% 0%, rgba(218, 255, 241, 0.08), transparent 70%);
+    mix-blend-mode: screen;
+  }
+
+  .garden-ui {
+    position: absolute;
+    top: 18px;
+    left: 20px;
+    right: 20px;
+    z-index: 9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: Consolas, monospace;
+    font-size: 9px;
+    letter-spacing: 0.13em;
+    color: rgba(225, 244, 235, 0.68);
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .garden-ui .clock {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .garden-ui .clock::before {
+    content: "";
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #b8e5ce;
+    box-shadow: 0 0 9px rgba(184, 229, 206, 0.9);
+  }
+
+  .garden-ui .rain {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: rgba(197, 225, 212, 0.60);
+  }
+
+  .rain-icon {
+    position: relative;
+    width: 10px;
+    height: 12px;
+    border: 1px solid rgba(194, 227, 213, 0.55);
+    border-radius: 7px 7px 8px 8px;
+    transform: rotate(8deg);
+  }
+
+  .rain-icon::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    height: 3px;
+    border-top: 1px solid rgba(194, 227, 213, 0.55);
+  }
+
+  .garden-foot {
+    position: absolute;
+    left: 21px;
+    right: 21px;
+    bottom: 18px;
+    z-index: 9;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-top: 28px;
+    font-family: Consolas, monospace;
+    font-size: 8px;
+    letter-spacing: 0.14em;
+    color: rgba(206, 230, 219, 0.46);
+    background: linear-gradient(to top, rgba(4, 12, 9, 0.52), transparent);
+  }
+
+  .garden-foot .hint {
+    color: rgba(206, 230, 219, 0.29);
+    font-family: "KaiTi", "STKaiti", serif;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+  }
+
+  .postcard {
+    left: 684px;
+    top: 618px;
+    z-index: 24;
+    transform: rotate(-4.2deg);
+    width: 278px;
+  }
+
+  .pc-a .pc-stamp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pc-a .pc-stamp svg {
+    width: 36px;
+    height: 44px;
+    opacity: 0.82;
+  }
+
+  .pc-row {
+    display: flex;
+    gap: 14px;
+    margin-top: 10px;
+    font-family: Consolas, monospace;
+    font-size: 7px;
+    letter-spacing: 0.12em;
+    color: #7a856f;
+  }
+
+  .pc-row b {
+    color: #44543f;
+    font-weight: 400;
+  }
+
+  .footer-mark {
+    position: absolute;
+    left: 64px;
+    bottom: 35px;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #566b63;
+    font-family: Consolas, monospace;
+    font-size: 8px;
+    letter-spacing: 0.19em;
+  }
+
+  .footer-mark::before {
+    content: "";
+    width: 32px;
+    height: 1px;
+    background: #42554d;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="ambient"></div>
+  <div class="grid"></div>
+
+  <div class="title">
+    <div class="eyebrow">Ambient keyboard game · concept A</div>
+    <h1>键息花园</h1>
+    <div class="sub">你工作，它下雨。你停下，它入夜。</div>
+    <div class="chips">
+      <span class="chip">零操作</span>
+      <span class="chip">余光陪伴</span>
+      <span class="chip">每日明信片</span>
+    </div>
+  </div>
+
+  <div class="index">
+    <b>A / 03</b><br>
+    BETWEEN KEYS<br>
+    1440 × 900
+  </div>
+
+  <div class="work">
+    <div class="workbar">
+      <div class="traffic"><i></i><i></i><i></i></div>
+      <div class="work-title">项目笔记 — 十月</div>
+      <div class="work-right">自动保存 · 18:42</div>
+    </div>
+    <div class="workbody">
+      <div class="workrail">
+        <div class="rail-icon active"></div>
+        <div class="rail-icon"></div>
+        <div class="rail-icon"></div>
+        <div class="rail-icon"></div>
+        <div class="rail-icon"></div>
+      </div>
+      <div class="workpaper">
+        <div class="paper-kicker">WORKSPACE / WEEKLY NOTES</div>
+        <div class="paper-h">第四季度规划</div>
+        <div class="paper-meta">最后编辑 3 分钟前 · 共享给 4 人</div>
+        <div class="paper-rule"></div>
+        <div class="line hl" style="width: 88%;"></div>
+        <div class="line" style="width: 79%;"></div>
+        <div class="line" style="width: 91%;"></div>
+        <div class="line" style="width: 64%;"></div>
+        <div class="line hl" style="width: 84%; margin-top: 24px;"></div>
+        <div class="line" style="width: 72%;"></div>
+        <div class="line" style="width: 86%;"></div>
+        <div class="work-table">
+          <div></div><div></div><div></div><div></div>
+          <div></div><div></div><div></div><div></div>
+          <div></div><div></div><div></div><div></div>
+          <div></div><div></div><div></div><div></div>
+        </div>
+        <div class="work-note">“先写下不需要解释的部分，剩下的明天再改。”</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="garden-card">
+    <div class="garden-ui">
+      <span class="clock">18:42</span>
+      <span class="rain"><i class="rain-icon"></i>微雨</span>
+    </div>
+
+    <div class="garden-art">
+      <svg viewBox="0 0 414 526" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="一只长满蕨类、蘑菇和萤火虫的桌面生态瓶">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#08191a"/>
+            <stop offset="0.52" stop-color="#0d2a26"/>
+            <stop offset="0.78" stop-color="#153a30"/>
+            <stop offset="1" stop-color="#0a1713"/>
+          </linearGradient>
+          <radialGradient id="moonHalo">
+            <stop offset="0" stop-color="#f8eac2" stop-opacity="0.45"/>
+            <stop offset="0.4" stop-color="#d6e3c2" stop-opacity="0.16"/>
+            <stop offset="1" stop-color="#cfe5d4" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="soil" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#183329"/>
+            <stop offset="0.4" stop-color="#10241d"/>
+            <stop offset="1" stop-color="#07100d"/>
+          </linearGradient>
+          <linearGradient id="pond" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#3b7a70"/>
+            <stop offset="0.5" stop-color="#22534f"/>
+            <stop offset="1" stop-color="#0e2a29"/>
+          </linearGradient>
+          <linearGradient id="leafGlow" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#a9cf96"/>
+            <stop offset="1" stop-color="#4f8465"/>
+          </linearGradient>
+          <radialGradient id="firefly">
+            <stop offset="0" stop-color="#fff6c9" stop-opacity="1"/>
+            <stop offset="0.18" stop-color="#e9e9a7" stop-opacity="0.9"/>
+            <stop offset="0.55" stop-color="#abd995" stop-opacity="0.24"/>
+            <stop offset="1" stop-color="#9fd68c" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="mushGlow">
+            <stop offset="0" stop-color="#f6bd7b" stop-opacity="0.36"/>
+            <stop offset="1" stop-color="#f6bd7b" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="blur6" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="6"/>
+          </filter>
+          <filter id="blur14" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="14"/>
+          </filter>
+          <filter id="glow" x="-120%" y="-120%" width="340%" height="340%">
+            <feGaussianBlur stdDeviation="3.4" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="softglow" x="-120%" y="-120%" width="340%" height="340%">
+            <feGaussianBlur stdDeviation="1.4" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <clipPath id="cardClip">
+            <rect width="414" height="526" rx="26"/>
+          </clipPath>
+        </defs>
+
+        <g clip-path="url(#cardClip)">
+          <rect width="414" height="526" fill="url(#sky)"/>
+
+          <!-- moon & sky -->
+          <circle cx="333" cy="92" r="92" fill="url(#moonHalo)"/>
+          <circle cx="333" cy="92" r="34" fill="#f2e4b8"/>
+          <circle cx="322" cy="83" r="6" fill="#e6d29f" opacity="0.45"/>
+          <circle cx="342" cy="103" r="4" fill="#e6d29f" opacity="0.38"/>
+          <circle cx="330" cy="110" r="3" fill="#e6d29f" opacity="0.30"/>
+
+          <g fill="#d9ece0">
+            <circle cx="42" cy="74" r="1.2" opacity="0.55"/>
+            <circle cx="91" cy="48" r="0.9" opacity="0.38"/>
+            <circle cx="140" cy="95" r="1.1" opacity="0.42"/>
+            <circle cx="195" cy="54" r="0.8" opacity="0.35"/>
+            <circle cx="244" cy="76" r="1.3" opacity="0.55"/>
+            <circle cx="284" cy="42" r="0.8" opacity="0.33"/>
+            <circle cx="372" cy="148" r="1" opacity="0.30"/>
+            <circle cx="115" cy="142" r="0.7" opacity="0.28"/>
+            <circle cx="62" cy="190" r="0.9" opacity="0.20"/>
+          </g>
+
+          <!-- distant hills -->
+          <path d="M0 310 C 58 268 112 274 158 300 C 214 326 259 268 316 280 C 357 288 389 300 414 292 L414 526 L0 526Z" fill="#102c25"/>
+          <path d="M0 340 C 66 305 120 316 178 338 C 238 360 294 316 344 330 C 379 340 402 352 414 348 L414 526 L0 526Z" fill="#0d231d"/>
+          <path d="M0 367 C 78 336 156 350 220 362 C 290 376 350 355 414 368 L414 526 L0 526Z" fill="#0a1a15"/>
+
+          <!-- ground -->
+          <path d="M0 407 C 68 360 147 377 210 397 C 281 420 337 387 414 372 L414 526 L0 526Z" fill="url(#soil)"/>
+          <path d="M0 421 C 89 390 164 408 232 425 C 302 443 355 411 414 396 L414 526 L0 526Z" fill="#0b1a14"/>
+          <g opacity="0.5" fill="#2e4d3b">
+            <ellipse cx="55" cy="430" rx="42" ry="13"/>
+            <ellipse cx="140" cy="450" rx="56" ry="16"/>
+            <ellipse cx="238" cy="435" rx="48" ry="14"/>
+            <ellipse cx="350" cy="420" rx="53" ry="15"/>
+          </g>
+
+          <!-- pond -->
+          <ellipse cx="304" cy="444" rx="79" ry="23" fill="url(#pond)"/>
+          <ellipse cx="304" cy="441" rx="62" ry="13" fill="#173e3b" opacity="0.55"/>
+          <path d="M260 441 Q 291 433 345 444" fill="none" stroke="#8cc8b3" stroke-width="1" opacity="0.34"/>
+          <path d="M275 450 Q 309 443 348 452" fill="none" stroke="#8cc8b3" stroke-width="0.8" opacity="0.20"/>
+          <g fill="#c9f0da" opacity="0.38">
+            <circle cx="279" cy="440" r="1.2"/>
+            <circle cx="327" cy="447" r="1"/>
+            <circle cx="349" cy="438" r="0.8"/>
+          </g>
+
+          <!-- hanging vine -->
+          <g>
+            <path d="M35 -8 C 40 35 29 65 44 104" fill="none" stroke="#4c7a59" stroke-width="2"/>
+            <g fill="#5f946e" opacity="0.95">
+              <ellipse cx="38" cy="20" rx="8" ry="4" transform="rotate(36 38 20)"/>
+              <ellipse cx="33" cy="43" rx="9" ry="4" transform="rotate(-42 33 43)"/>
+              <ellipse cx="41" cy="66" rx="7" ry="3.4" transform="rotate(39 41 66)"/>
+              <ellipse cx="39" cy="88" rx="8" ry="3.6" transform="rotate(-35 39 88)"/>
+            </g>
+          </g>
+
+          <!-- back plants -->
+          <g opacity="0.72">
+            <path d="M94 405 C 91 364 106 337 134 318" fill="none" stroke="#4b7759" stroke-width="2"/>
+            <path d="M132 405 C 142 370 158 349 184 338" fill="none" stroke="#41694e" stroke-width="1.6"/>
+            <g fill="#547f60">
+              <ellipse cx="116" cy="352" rx="13" ry="4" transform="rotate(-42 116 352)"/>
+              <ellipse cx="124" cy="335" rx="11" ry="3.6" transform="rotate(-54 124 335)"/>
+              <ellipse cx="157" cy="359" rx="12" ry="3.7" transform="rotate(-31 157 359)"/>
+              <ellipse cx="169" cy="348" rx="9" ry="3" transform="rotate(-48 169 348)"/>
+            </g>
+          </g>
+
+          <!-- broad leaf plant right -->
+          <g>
+            <path d="M330 442 C 326 390 329 344 348 306" fill="none" stroke="#48765a" stroke-width="2.5"/>
+            <path d="M342 440 C 358 402 378 378 399 360" fill="none" stroke="#3f6b4f" stroke-width="2"/>
+            <path d="M348 306 C 318 292 296 267 292 238 C 324 246 348 270 348 306Z" fill="#689a72"/>
+            <path d="M348 306 C 371 286 379 258 374 232 C 348 251 340 278 348 306Z" fill="#7eae80"/>
+            <path d="M399 360 C 381 346 371 326 373 304 C 396 315 408 335 399 360Z" fill="#5b8b68"/>
+            <path d="M399 360 C 414 347 425 332 424 314 C 407 321 398 339 399 360Z" fill="#709f75"/>
+            <path d="M348 306 C 336 289 329 270 333 250" fill="none" stroke="#a9c998" stroke-width="0.8" opacity="0.5"/>
+            <path d="M399 360 C 388 345 383 330 384 315" fill="none" stroke="#a9c998" stroke-width="0.7" opacity="0.4"/>
+          </g>
+
+          <!-- fern left -->
+          <g transform="translate(108 458)">
+            <path d="M0 0 C -23 -38 -40 -78 -58 -126" fill="none" stroke="#507f5f" stroke-width="2.4"/>
+            <path d="M0 0 C 5 -42 19 -83 39 -117" fill="none" stroke="#5e9068" stroke-width="2"/>
+            <path d="M0 0 C -43 -31 -70 -57 -93 -91" fill="none" stroke="#477557" stroke-width="1.8"/>
+            <g fill="#7eae7c">
+              <ellipse cx="-13" cy="-31" rx="13" ry="4" transform="rotate(-56 -13 -31)"/>
+              <ellipse cx="-26" cy="-52" rx="12" ry="3.7" transform="rotate(-62 -26 -52)"/>
+              <ellipse cx="-38" cy="-73" rx="10" ry="3.3" transform="rotate(-68 -38 -73)"/>
+              <ellipse cx="-47" cy="-95" rx="8" ry="2.8" transform="rotate(-73 -47 -95)"/>
+              <ellipse cx="12" cy="-35" rx="12" ry="3.8" transform="rotate(-102 12 -35)"/>
+              <ellipse cx="20" cy="-58" rx="11" ry="3.4" transform="rotate(-107 20 -58)"/>
+              <ellipse cx="29" cy="-80" rx="9" ry="3" transform="rotate(-112 29 -80)"/>
+              <ellipse cx="-31" cy="-28" rx="12" ry="3.8" transform="rotate(-14 -31 -28)"/>
+              <ellipse cx="-49" cy="-48" rx="11" ry="3.4" transform="rotate(-8 -49 -48)"/>
+              <ellipse cx="-62" cy="-66" rx="9" ry="2.9" transform="rotate(-1 -62 -66)"/>
+              <ellipse cx="22" cy="-25" rx="11" ry="3.5" transform="rotate(24 22 -25)"/>
+              <ellipse cx="33" cy="-45" rx="10" ry="3.1" transform="rotate(19 33 -45)"/>
+            </g>
+            <g fill="#5a8a63" opacity="0.75">
+              <ellipse cx="-18" cy="-22" rx="9" ry="3" transform="rotate(-74 -18 -22)"/>
+              <ellipse cx="-29" cy="-42" rx="8" ry="2.7" transform="rotate(-78 -29 -42)"/>
+              <ellipse cx="8" cy="-48" rx="8" ry="2.7" transform="rotate(-113 8 -48)"/>
+            </g>
+          </g>
+
+          <!-- moss and grass -->
+          <g>
+            <g fill="#7f9d68" opacity="0.95">
+              <circle cx="30" cy="470" r="5"/><circle cx="42" cy="466" r="4"/><circle cx="53" cy="472" r="6"/>
+              <circle cx="66" cy="468" r="3.5"/><circle cx="76" cy="474" r="5"/><circle cx="90" cy="470" r="3"/>
+            </g>
+            <g stroke="#557c5c" stroke-width="1.2" fill="none" opacity="0.8">
+              <path d="M24 510 C 20 489 25 478 34 469"/>
+              <path d="M32 510 C 34 493 42 483 51 477"/>
+              <path d="M184 500 C 180 481 186 470 196 461"/>
+              <path d="M194 505 C 197 489 205 480 214 475"/>
+              <path d="M366 490 C 362 474 369 463 378 455"/>
+            </g>
+            <g fill="#c9d6a4">
+              <circle cx="40" cy="461" r="2.4"/><circle cx="52" cy="458" r="1.8"/><circle cx="69" cy="463" r="2"/>
+              <circle cx="201" cy="455" r="2"/><circle cx="214" cy="449" r="1.6"/><circle cx="381" cy="450" r="1.8"/>
+            </g>
+          </g>
+
+          <!-- mushrooms -->
+          <g>
+            <ellipse cx="248" cy="456" rx="51" ry="18" fill="url(#mushGlow)" filter="url(#blur6)"/>
+            <g transform="translate(236 447)">
+              <path d="M-5 0 L -4 24 Q 1 28 6 24 L 6 0Z" fill="#d8c39b"/>
+              <path d="M-26 2 C -20 -20 20 -20 26 2 C 14 8 -14 9 -26 2Z" fill="#e4a76e"/>
+              <path d="M-19 1 C -13 -13 14 -13 20 1 C 11 5 -11 5 -19 1Z" fill="#f1c58c" opacity="0.55"/>
+              <g fill="#f9e2b7" opacity="0.75">
+                <circle cx="-10" cy="-4" r="2"/><circle cx="4" cy="-8" r="1.5"/><circle cx="14" cy="-3" r="1.7"/>
+              </g>
+            </g>
+            <g transform="translate(281 462) scale(0.72)">
+              <path d="M-4 0 L -4 19 Q 1 22 5 19 L 5 0Z" fill="#cdb990"/>
+              <path d="M-21 1 C -15 -18 15 -18 21 1 C 11 7 -11 7 -21 1Z" fill="#d99764"/>
+              <path d="M-14 1 C -9 -10 9 -10 14 1 C 7 4 -7 4 -14 1Z" fill="#edbd86" opacity="0.5"/>
+            </g>
+            <g transform="translate(211 468) scale(0.5)">
+              <path d="M-4 0 L -3 18 Q 1 21 5 18 L 5 0Z" fill="#cbb78c"/>
+              <path d="M-20 1 C -14 -17 14 -17 20 1 C 10 6 -10 6 -20 1Z" fill="#e1a36d"/>
+            </g>
+          </g>
+
+          <!-- tiny white flowers -->
+          <g transform="translate(175 449)">
+            <path d="M0 0 C -2 -18 -5 -30 -11 -40" fill="none" stroke="#638b63" stroke-width="1.2"/>
+            <path d="M2 0 C 6 -13 12 -22 20 -28" fill="none" stroke="#638b63" stroke-width="1"/>
+            <g fill="#e9e5c5">
+              <circle cx="-11" cy="-42" r="2.4"/><circle cx="-16" cy="-40" r="1.7"/><circle cx="-7" cy="-40" r="1.7"/>
+              <circle cx="-11" cy="-46" r="1.7"/>
+              <circle cx="21" cy="-30" r="2"/><circle cx="17" cy="-28" r="1.4"/><circle cx="25" cy="-28" r="1.4"/>
+            </g>
+            <g fill="#e7bc6f">
+              <circle cx="-11" cy="-42" r="0.8"/><circle cx="21" cy="-30" r="0.7"/>
+            </g>
+          </g>
+
+          <!-- snail -->
+          <g transform="translate(151 478)">
+            <path d="M-31 10 C -23 4 -16 8 -10 12 C 2 17 14 15 26 10 C 20 20 6 23 -6 20 C -18 17 -26 17 -31 10Z" fill="#9b9772"/>
+            <path d="M16 10 C 24 8 31 10 35 14 C 29 15 22 15 16 13Z" fill="#b0a982"/>
+            <circle cx="-1" cy="1" r="14" fill="#b3a77d"/>
+            <path d="M-1 -10 C 5 -10 9 -5 9 0 C 9 6 4 9 -1 9 C -7 9 -11 5 -11 0 C -11 -5 -6 -9 -1 -9 C 3 -9 6 -6 6 -2" fill="none" stroke="#777452" stroke-width="1.5" opacity="0.8"/>
+            <g fill="#666b50">
+              <circle cx="-1" cy="-12" r="1"/><circle cx="10" cy="-8" r="1"/>
+            </g>
+          </g>
+
+          <!-- foreground broad leaves -->
+          <g>
+            <path d="M24 526 C 39 482 61 457 91 441 C 88 476 63 505 24 526Z" fill="#356049"/>
+            <path d="M45 526 C 67 493 94 477 123 471 C 113 501 82 520 45 526Z" fill="#294c3b" opacity="0.92"/>
+            <path d="M80 526 C 99 503 120 490 143 484 C 133 507 108 522 80 526Z" fill="#396a4e" opacity="0.75"/>
+          </g>
+
+          <!-- fog -->
+          <ellipse cx="206" cy="426" rx="180" ry="26" fill="#b8d9c6" opacity="0.055" filter="url(#blur14)"/>
+
+          <!-- rain -->
+          <g stroke="#c8e4d7" stroke-linecap="round">
+            <g opacity="0.24">
+              <path d="M46 120 L34 157" stroke-width="1"/>
+              <path d="M113 72 L101 109" stroke-width="0.8"/>
+              <path d="M167 132 L155 169" stroke-width="1.1"/>
+              <path d="M232 60 L220 98" stroke-width="0.8"/>
+              <path d="M279 146 L267 183" stroke-width="1"/>
+              <path d="M356 190 L344 228" stroke-width="0.8"/>
+              <path d="M386 84 L374 121" stroke-width="0.7"/>
+            </g>
+            <g opacity="0.14">
+              <path d="M72 220 L60 257" stroke-width="0.9"/>
+              <path d="M147 205 L135 242" stroke-width="0.7"/>
+              <path d="M209 242 L197 279" stroke-width="0.9"/>
+              <path d="M302 230 L290 267" stroke-width="0.8"/>
+              <path d="M367 273 L355 310" stroke-width="0.7"/>
+              <path d="M30 280 L18 317" stroke-width="0.7"/>
+              <path d="M255 310 L243 347" stroke-width="0.6"/>
+            </g>
+          </g>
+
+          <!-- fireflies -->
+          <g>
+            <g filter="url(#glow)">
+              <circle cx="99" cy="386" r="10" fill="url(#firefly)"/>
+              <circle cx="99" cy="386" r="1.8" fill="#fff5c4"/>
+            </g>
+            <g filter="url(#glow)">
+              <circle cx="252" cy="378" r="8" fill="url(#firefly)"/>
+              <circle cx="252" cy="378" r="1.4" fill="#fff5c4"/>
+            </g>
+            <g filter="url(#glow)">
+              <circle cx="336" cy="361" r="7" fill="url(#firefly)"/>
+              <circle cx="336" cy="361" r="1.2" fill="#fff5c4"/>
+            </g>
+            <g filter="url(#glow)">
+              <circle cx="291" cy="407" r="5" fill="url(#firefly)"/>
+              <circle cx="291" cy="407" r="1" fill="#fff5c4"/>
+            </g>
+            <g filter="url(#glow)" opacity="0.7">
+              <circle cx="174" cy="359" r="4" fill="url(#firefly)"/>
+              <circle cx="174" cy="359" r="0.8" fill="#fff5c4"/>
+            </g>
+          </g>
+
+          <!-- glass edge highlights -->
+          <path d="M0 34 C 0 15 15 0 34 0 L172 0" fill="none" stroke="#d9ffef" stroke-width="1" opacity="0.22"/>
+          <path d="M0 76 C 28 61 53 42 72 16" fill="none" stroke="#d9ffef" stroke-width="1" opacity="0.10"/>
+          <path d="M414 238 L414 492 C 414 511 399 526 380 526" fill="none" stroke="#d9ffef" stroke-width="1" opacity="0.08"/>
+        </g>
+      </svg>
+      <div class="glass-sheen"></div>
+    </div>
+
+    <div class="garden-foot">
+      <span>第 12 天 · 傍晚</span>
+      <span class="hint">继续工作，别管我</span>
+    </div>
+  </div>
+
+  <div class="postcard pc-a">
+    <div class="pc-stamp">
+      <svg viewBox="0 0 36 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M18 38 C 17 28 13 18 4 10" fill="none" stroke="#48624a" stroke-width="1.1"/>
+        <path d="M4 10 C 9 7 14 8 17 12 C 13 16 8 16 4 10Z" fill="#5f7d5d"/>
+        <path d="M9 19 C 14 16 19 18 21 22 C 17 25 12 24 9 19Z" fill="#718d6a"/>
+        <path d="M14 27 C 19 24 24 27 25 31 C 21 33 16 32 14 27Z" fill="#5f7d5d"/>
+        <path d="M18 38 C 20 27 25 19 33 13" fill="none" stroke="#48624a" stroke-width="0.9" opacity="0.6"/>
+        <circle cx="27" cy="9" r="2.2" fill="#b98b54"/>
+      </svg>
+    </div>
+    <div class="pc-top"><span>TODAY'S GARDEN</span><span>DAY 012</span></div>
+    <div class="pc-title">晨间阵雨</div>
+    <div class="pc-rule"></div>
+    <div class="pc-body">新芽 3 · 来访者 1<br>你工作时，它长了一点点。</div>
+    <div class="pc-row"><span>雨型 <b>阵雨</b></span><span>光照 <b>偏暗</b></span><span>土 <b>湿润</b></span></div>
+    <div class="pc-sign">18:42 · 傍晚的第一次巡视</div>
+  </div>
+
+  <div class="footer-mark">NORMAL WORK IS THE CONTROLLER</div>
+  <div class="grain"></div>
+  <div class="vignette"></div>
+</div>
+</body>
+</html>

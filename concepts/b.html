@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>概念 B · 桌边远行</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .work { top: 205px; width: 880px; height: 470px; opacity: 0.78; }
+  .workpaper { padding: 28px 42px; }
+  .work-note { bottom: 22px; }
+
+  .journey {
+    position: absolute;
+    left: 64px;
+    top: 690px;
+    z-index: 26;
+    width: 1312px;
+    height: 160px;
+    overflow: hidden;
+    border: 1px solid rgba(206, 230, 241, 0.13);
+    border-radius: 22px;
+    background: #08121c;
+    box-shadow:
+      0 30px 70px rgba(0, 0, 0, 0.55),
+      0 0 70px rgba(83, 132, 161, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  }
+
+  .journey svg {
+    display: block;
+    width: 1312px;
+    height: 160px;
+  }
+
+  .journey::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    border-radius: 22px;
+    background:
+      linear-gradient(90deg, rgba(6, 13, 20, 0.38), transparent 12%, transparent 88%, rgba(6, 13, 20, 0.30)),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05), transparent 18%);
+    box-shadow: inset 0 0 0 1px rgba(226, 245, 255, 0.035);
+  }
+
+  .journey-ui {
+    position: absolute;
+    z-index: 4;
+    top: 18px;
+    left: 23px;
+    right: 23px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+  }
+
+  .journey-place {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    color: rgba(226, 239, 236, 0.82);
+    font-family: Consolas, monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
+  }
+
+  .pin {
+    position: relative;
+    width: 11px;
+    height: 11px;
+    border: 1px solid rgba(239, 202, 142, 0.72);
+    border-radius: 50%;
+  }
+
+  .pin::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: #efca8e;
+    box-shadow: 0 0 8px rgba(239, 202, 142, 0.8);
+  }
+
+  .journey-place b {
+    color: #f0dfbd;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+  }
+
+  .journey-place span {
+    color: rgba(183, 203, 204, 0.48);
+    margin-left: 4px;
+  }
+
+  .journey-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: rgba(188, 209, 207, 0.48);
+    font-family: Consolas, monospace;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.65);
+  }
+
+  .journey-meta i {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 5px;
+    border: 1px solid rgba(186, 207, 204, 0.45);
+    border-radius: 50%;
+    vertical-align: -1px;
+  }
+
+  .route {
+    position: absolute;
+    z-index: 4;
+    left: 23px;
+    bottom: 17px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    pointer-events: none;
+  }
+
+  .route span {
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(176, 204, 199, 0.22);
+  }
+
+  .route span.done { background: rgba(232, 205, 156, 0.65); box-shadow: 0 0 6px rgba(232, 205, 156, 0.35); }
+  .route span.now { width: 6px; height: 6px; background: #f1d39b; box-shadow: 0 0 11px rgba(241, 211, 155, 0.8); }
+
+  .route-line {
+    width: 122px;
+    height: 1px;
+    margin: 0 3px;
+    background: linear-gradient(90deg, rgba(228, 199, 151, 0.45), rgba(228, 199, 151, 0.08));
+  }
+
+  .postcard {
+    left: 1004px;
+    top: 448px;
+    z-index: 28;
+    width: 306px;
+    padding: 19px 20px 17px;
+    transform: rotate(2.4deg);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.4), transparent 42%),
+      #eae2cf;
+  }
+
+  .pc-b .pc-title {
+    margin-top: 9px;
+    font-size: 27px;
+  }
+
+  .pc-b .pc-body {
+    font-size: 12px;
+  }
+
+  .pc-b .pc-stamp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed rgba(72, 84, 74, 0.38);
+    background: rgba(235, 239, 222, 0.35);
+  }
+
+  .pc-b .pc-stamp svg { width: 45px; height: 50px; }
+
+  .pc-b .pc-rule { margin: 10px 0 9px; }
+
+  .souvenirs {
+    display: flex;
+    gap: 8px;
+    margin-top: 11px;
+  }
+
+  .souvenir {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 4px 5px;
+    border: 1px solid rgba(73, 83, 68, 0.17);
+    border-radius: 3px;
+    color: #7d846f;
+    font-family: "Microsoft YaHei UI", sans-serif;
+    font-size: 7px;
+    letter-spacing: 0.05em;
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  .souvenir.selected {
+    border-color: rgba(137, 101, 54, 0.55);
+    background: rgba(193, 164, 109, 0.15);
+    color: #5f573f;
+  }
+
+  .souvenir svg { width: 18px; height: 18px; opacity: 0.72; }
+  .souvenir.selected svg { opacity: 1; }
+
+  .pc-b .pc-sign { margin-top: 10px; }
+
+  .compass {
+    position: absolute;
+    right: 78px;
+    top: 357px;
+    z-index: 29;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(202, 224, 217, 0.16);
+    border-radius: 50%;
+    opacity: 0.55;
+    transform: rotate(-18deg);
+  }
+
+  .compass::before,
+  .compass::after {
+    content: "";
+    position: absolute;
+    background: rgba(202, 224, 217, 0.4);
+  }
+
+  .compass::before {
+    left: 18px;
+    top: 7px;
+    width: 1px;
+    height: 23px;
+  }
+
+  .compass::after {
+    left: 9px;
+    top: 18px;
+    width: 19px;
+    height: 1px;
+  }
+
+  .footer-mark {
+    position: absolute;
+    left: 64px;
+    bottom: 24px;
+    z-index: 30;
+    color: #566b63;
+    font-family: Consolas, monospace;
+    font-size: 8px;
+    letter-spacing: 0.19em;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="ambient"></div>
+  <div class="grid"></div>
+
+  <div class="title">
+    <div class="eyebrow">Ambient keyboard game · concept B</div>
+    <h1>桌边远行</h1>
+    <div class="sub">你工作，他赶路；你停下，他扎营。</div>
+    <div class="chips">
+      <span class="chip">探索叙事</span>
+      <span class="chip">底部常驻</span>
+      <span class="chip">每日明信片</span>
+    </div>
+  </div>
+
+  <div class="index">
+    <b>B / 03</b><br>
+    DESK BOUND<br>
+    1440 × 900
+  </div>
+
+  <div class="work">
+    <div class="workbar">
+      <div class="traffic"><i></i><i></i><i></i></div>
+      <div class="work-title">周报草稿 — 十月第四周</div>
+      <div class="work-right">已保存 · 20:16</div>
+    </div>
+    <div class="workbody">
+      <div class="workrail">
+        <div class="rail-icon active"></div>
+        <div class="rail-icon"></div>
+        <div class="rail-icon"></div>
+        <div class="rail-icon"></div>
+      </div>
+      <div class="workpaper">
+        <div class="paper-kicker">WORKLOG / WEEK 43</div>
+        <div class="paper-h">本周进展与下周计划</div>
+        <div class="paper-meta">草稿 · 最后编辑 1 分钟前</div>
+        <div class="paper-rule"></div>
+        <div class="line hl" style="width: 83%;"></div>
+        <div class="line" style="width: 91%;"></div>
+        <div class="line" style="width: 67%;"></div>
+        <div class="line hl" style="width: 74%; margin-top: 22px;"></div>
+        <div class="line" style="width: 88%;"></div>
+        <div class="line" style="width: 57%;"></div>
+        <div class="work-table">
+          <div></div><div></div><div></div><div></div>
+          <div></div><div></div><div></div><div></div>
+          <div></div><div></div><div></div><div></div>
+        </div>
+        <div class="work-note">“把没做完的事，留给明天的自己。”</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="compass"></div>
+
+  <div class="postcard pc-b">
+    <div class="pc-stamp">
+      <svg viewBox="0 0 45 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M2 38 L12 22 L19 31 L27 16 L43 38Z" fill="#708f8e" opacity="0.65"/>
+        <path d="M2 38 L12 29 L19 35 L27 24 L43 38Z" fill="#496d70" opacity="0.65"/>
+        <circle cx="34" cy="11" r="4" fill="#c4a66e" opacity="0.8"/>
+        <path d="M2 41 L43 41" stroke="#58716e" stroke-width="0.6" opacity="0.5"/>
+      </svg>
+    </div>
+    <div class="pc-top"><span>POSTCARD FROM THE DESK</span><span>DAY 027</span></div>
+    <div class="pc-title">雾之谷</div>
+    <div class="pc-rule"></div>
+    <div class="pc-body">今天拾到一枚旧车票。<br>上面的日期已经模糊了。</div>
+    <div class="souvenirs">
+      <div class="souvenir selected">
+        <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 5h14v8H2z"/><path d="M11 5v8" stroke-dasharray="2 1.5"/><path d="M4 8h4M4 10.5h3"/></svg>
+        <span>旧车票</span>
+      </div>
+      <div class="souvenir">
+        <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1"><path d="M9 2l4 5-2 8H7L5 7z"/><path d="M9 2v13"/></svg>
+        <span>松果</span>
+      </div>
+      <div class="souvenir">
+        <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 15C5 8 9 4 15 2c-1 6-4 11-11 13Z"/><path d="M4 15L12 6"/></svg>
+        <span>羽毛</span>
+      </div>
+    </div>
+    <div class="pc-sign">三选一 · 明早出发前决定</div>
+  </div>
+
+  <div class="journey">
+    <svg viewBox="0 0 1312 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="屏幕底部的一条山谷旅行风景带">
+      <defs>
+        <linearGradient id="jsky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#0a1726"/>
+          <stop offset="0.58" stop-color="#11283c"/>
+          <stop offset="1" stop-color="#1a3b48"/>
+        </linearGradient>
+        <linearGradient id="jground" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#10252a"/>
+          <stop offset="1" stop-color="#081419"/>
+        </linearGradient>
+        <linearGradient id="jpath" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#b99a67" stop-opacity="0.05"/>
+          <stop offset="0.45" stop-color="#cfb178" stop-opacity="0.35"/>
+          <stop offset="1" stop-color="#e3c58b" stop-opacity="0.10"/>
+        </linearGradient>
+        <radialGradient id="jmoonHalo">
+          <stop offset="0" stop-color="#f7e7bb" stop-opacity="0.45"/>
+          <stop offset="1" stop-color="#f7e7bb" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="jfire">
+          <stop offset="0" stop-color="#ffd79a" stop-opacity="0.95"/>
+          <stop offset="0.35" stop-color="#f09d59" stop-opacity="0.45"/>
+          <stop offset="1" stop-color="#d67e3e" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="jlantern">
+          <stop offset="0" stop-color="#ffe4b0" stop-opacity="0.95"/>
+          <stop offset="0.35" stop-color="#eeb16a" stop-opacity="0.34"/>
+          <stop offset="1" stop-color="#eeb16a" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="jblur" x="-30%" y="-60%" width="160%" height="220%">
+          <feGaussianBlur stdDeviation="8"/>
+        </filter>
+        <filter id="jsoft" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="2.2" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="jglow" x="-120%" y="-120%" width="340%" height="340%">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <clipPath id="jclip"><rect width="1312" height="160" rx="22"/></clipPath>
+      </defs>
+
+      <g clip-path="url(#jclip)">
+        <rect width="1312" height="160" fill="url(#jsky)"/>
+
+        <!-- stars -->
+        <g fill="#dbe8de">
+          <circle cx="87" cy="34" r="0.8" opacity="0.38"/>
+          <circle cx="163" cy="50" r="0.6" opacity="0.24"/>
+          <circle cx="246" cy="26" r="1" opacity="0.42"/>
+          <circle cx="330" cy="42" r="0.6" opacity="0.22"/>
+          <circle cx="425" cy="19" r="0.9" opacity="0.35"/>
+          <circle cx="523" cy="39" r="0.7" opacity="0.27"/>
+          <circle cx="655" cy="24" r="0.9" opacity="0.30"/>
+          <circle cx="752" cy="47" r="0.6" opacity="0.20"/>
+          <circle cx="886" cy="25" r="0.8" opacity="0.32"/>
+          <circle cx="1012" cy="44" r="0.6" opacity="0.22"/>
+          <circle cx="1238" cy="27" r="0.9" opacity="0.36"/>
+          <circle cx="1285" cy="60" r="0.6" opacity="0.22"/>
+        </g>
+
+        <!-- moon -->
+        <circle cx="1122" cy="45" r="55" fill="url(#jmoonHalo)"/>
+        <circle cx="1122" cy="45" r="17" fill="#f0e5c2"/>
+        <circle cx="1117" cy="40" r="3" fill="#e3d3a9" opacity="0.45"/>
+        <ellipse cx="640" cy="108" rx="420" ry="34" fill="#5f8f96" opacity="0.06" filter="url(#jblur)"/>
+
+        <g fill="none" stroke="#9fb7b3" stroke-width="0.8">
+          <path d="M698 55 C 701 52 704 54 706 57 C 708 54 711 52 714 55" opacity="0.20"/>
+          <path d="M724 64 C 726 62 728 63 730 66 C 732 63 734 62 736 64" opacity="0.14"/>
+        </g>
+
+        <!-- far mountains -->
+        <path d="M0 104 L55 86 L92 95 L148 72 L198 94 L254 79 L318 98 L382 68 L442 96 L506 78 L566 97 L636 70 L700 93 L758 80 L814 99 L884 74 L948 96 L1018 72 L1082 97 L1150 80 L1218 96 L1270 84 L1312 92 L1312 160 L0 160Z" fill="#183448" opacity="0.46"/>
+        <path d="M0 118 L64 99 L123 110 L186 88 L250 111 L318 94 L380 114 L448 85 L514 111 L580 96 L638 115 L708 88 L770 111 L846 95 L906 114 L978 90 L1038 112 L1108 94 L1170 113 L1242 92 L1312 109 L1312 160 L0 160Z" fill="#11283a" opacity="0.76"/>
+
+        <!-- mist behind ridge -->
+        <ellipse cx="220" cy="112" rx="270" ry="22" fill="#a7c9cd" opacity="0.055" filter="url(#jblur)"/>
+        <ellipse cx="820" cy="107" rx="330" ry="18" fill="#a7c9cd" opacity="0.045" filter="url(#jblur)"/>
+
+        <!-- pines back -->
+        <g fill="#0b1b24">
+          <g transform="translate(92 112) scale(0.8)">
+            <rect x="-1.5" y="0" width="3" height="20" fill="#0a171e"/>
+            <path d="M0 -33 L13 -8 L5 -8 L18 10 L-18 10 L-5 -8 L-13 -8Z"/>
+          </g>
+          <g transform="translate(140 121) scale(0.55)">
+            <rect x="-1.5" y="0" width="3" height="20" fill="#0a171e"/>
+            <path d="M0 -33 L13 -8 L5 -8 L18 10 L-18 10 L-5 -8 L-13 -8Z"/>
+          </g>
+          <g transform="translate(582 113) scale(0.72)">
+            <rect x="-1.5" y="0" width="3" height="20" fill="#0a171e"/>
+            <path d="M0 -33 L13 -8 L5 -8 L18 10 L-18 10 L-5 -8 L-13 -8Z"/>
+          </g>
+          <g transform="translate(1212 118) scale(0.62)">
+            <rect x="-1.5" y="0" width="3" height="20" fill="#0a171e"/>
+            <path d="M0 -33 L13 -8 L5 -8 L18 10 L-18 10 L-5 -8 L-13 -8Z"/>
+          </g>
+          <g transform="translate(1270 126) scale(0.42)">
+            <path d="M0 -33 L13 -8 L5 -8 L18 10 L-18 10 L-5 -8 L-13 -8Z"/>
+          </g>
+        </g>
+
+        <!-- front ground -->
+        <path d="M0 132 C 130 121 248 128 362 133 C 490 139 574 127 696 130 C 808 133 920 125 1040 129 C 1150 133 1248 128 1312 124 L1312 160 L0 160Z" fill="url(#jground)"/>
+        <path d="M0 144 C 110 135 236 142 344 146 C 482 151 590 141 700 145 C 828 150 946 141 1058 145 C 1174 149 1254 143 1312 140 L1312 160 L0 160Z" fill="#071015"/>
+
+        <!-- winding path -->
+        <path d="M0 149 C 155 142 220 151 350 146 C 482 141 538 151 664 147 C 786 143 846 151 962 146 C 1084 141 1198 151 1312 140" fill="none" stroke="#645541" stroke-width="9" stroke-linecap="round" opacity="0.20"/>
+        <path d="M0 149 C 155 142 220 151 350 146 C 482 141 538 151 664 147 C 786 143 846 151 962 146 C 1084 141 1198 151 1312 140" fill="none" stroke="url(#jpath)" stroke-width="7" stroke-linecap="round"/>
+        <path d="M0 149 C 155 142 220 151 350 146 C 482 141 538 151 664 147 C 786 143 846 151 962 146 C 1084 141 1198 151 1312 140" fill="none" stroke="#d5b67f" stroke-width="0.8" stroke-dasharray="1.5 14" opacity="0.30"/>
+
+        <!-- distant camp -->
+        <g transform="translate(304 118)">
+          <ellipse cx="28" cy="30" rx="48" ry="11" fill="#df9c59" opacity="0.10" filter="url(#jblur)"/>
+          <path d="M-12 31 L10 11 L31 31Z" fill="#b97854"/>
+          <path d="M10 11 L31 31 L10 31Z" fill="#774b3d"/>
+          <path d="M8 31 L10 20 L16 31Z" fill="#f2bd7a" opacity="0.85"/>
+          <path d="M-14 31 L-12 27" stroke="#d8c8ae" stroke-width="1" opacity="0.45"/>
+        </g>
+
+        <!-- campfire -->
+        <g transform="translate(364 135)">
+          <circle cx="0" cy="2" r="33" fill="url(#jfire)" filter="url(#jblur)"/>
+          <path d="M-9 7 L9 4" stroke="#6b4b3a" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M-7 4 L8 8" stroke="#7f5b45" stroke-width="2" stroke-linecap="round"/>
+          <path d="M0 6 C -5 -2 -2 -7 1 -13 C 3 -7 8 -5 5 2 C 3 6 1 7 0 6Z" fill="#f3ad62"/>
+          <path d="M0 5 C -2 0 -1 -4 1 -7 C 3 -3 4 0 3 3 C 2 5 1 6 0 5Z" fill="#ffe1a6"/>
+          <g fill="#f6b870" filter="url(#jsoft)" opacity="0.8">
+            <circle cx="-7" cy="-7" r="1"/><circle cx="8" cy="-10" r="0.8"/><circle cx="4" cy="-17" r="0.7"/>
+          </g>
+        </g>
+
+        <!-- fox -->
+        <g transform="translate(622 139)" fill="#101b20">
+          <ellipse cx="0" cy="0" rx="12" ry="6"/>
+          <path d="M9 -2 L17 -10 L15 -17 L9 -10Z"/>
+          <path d="M6 -8 L9 -17 L13 -10Z"/>
+          <path d="M-11 1 C -24 -3 -25 9 -17 11 C -22 4 -17 1 -11 4Z"/>
+          <path d="M9 3 L12 10 M-5 4 L-7 10" stroke="#101b20" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="9" cy="-5" r="0.9" fill="#d6b57c"/>
+        </g>
+
+        <!-- signpost -->
+        <g transform="translate(760 137)">
+          <ellipse cx="0" cy="8" rx="13" ry="3" fill="#000" opacity="0.24" filter="url(#jsoft)"/>
+          <line x1="0" y1="8" x2="0" y2="-24" stroke="#6e5a43" stroke-width="2"/>
+          <path d="M0 -23 L25 -23 L31 -18 L25 -13 L0 -13Z" fill="#65533f"/>
+          <path d="M0 -11 L-17 -11 L-23 -6 L-17 -1 L0 -1Z" fill="#574735"/>
+          <path d="M4 -18 L16 -18 M-4 -6 L-12 -6" stroke="#a88962" stroke-width="0.7" opacity="0.45"/>
+        </g>
+
+        <!-- distant cabin -->
+        <g transform="translate(1064 106)">
+          <circle cx="18" cy="36" r="36" fill="url(#jlantern)" opacity="0.55"/>
+          <ellipse cx="25" cy="45" rx="42" ry="10" fill="#e5a55e" opacity="0.12" filter="url(#jblur)"/>
+          <path d="M0 46V29L24 12L49 29V46Z" fill="#262c26"/>
+          <path d="M49 46V29L49 29L54 32V46Z" fill="#1c221f"/>
+          <path d="M-6 30L24 8L55 30L49 34L24 16L0 33Z" fill="#47392a"/>
+          <path d="M-6 30L24 8L55 30" fill="none" stroke="#71593d" stroke-width="0.7" opacity="0.55"/>
+          <rect x="9" y="29" width="14" height="14" fill="#6b4b2f"/>
+          <rect x="11" y="31" width="10" height="10" fill="#ffd28a"/>
+          <path d="M16 31V41 M11 36H21" stroke="#6b4b2f" stroke-width="0.9"/>
+          <rect x="37" y="32" width="6" height="8" fill="#3c2b1d" opacity="0.9"/>
+          <rect x="35" y="12" width="6" height="16" fill="#3d3428"/>
+          <path d="M38 10 C 33 2 41 -2 37 -10 C 34 -15 40 -20 37 -27" fill="none" stroke="#c7d6cc" stroke-width="2.4" opacity="0.13" filter="url(#jsoft)"/>
+          <path d="M-1 46L51 46" stroke="#4d4535" stroke-width="1.2" opacity="0.8"/>
+          <path d="M-4 49 L56 49" stroke="#2f2e26" stroke-width="1" opacity="0.5"/>
+          <path d="M-2 46 C -6 47 -8 50 -7 52" fill="none" stroke="#5b5140" stroke-width="1" opacity="0.6"/>
+        </g>
+
+        <!-- fence near cabin -->
+        <g stroke="#4a4132" stroke-width="1" opacity="0.55">
+          <path d="M1014 145 L1014 130 M1028 146 L1028 131 M1042 147 L1042 132"/>
+          <path d="M1012 136 L1044 138 M1012 142 L1044 144"/>
+        </g>
+
+        <!-- footprints -->
+        <g fill="#d1b887" opacity="0.16">
+          <ellipse cx="846" cy="145" rx="3" ry="1.2" transform="rotate(-9 846 145)"/>
+          <ellipse cx="858" cy="142" rx="2.7" ry="1.1" transform="rotate(-9 858 142)"/>
+          <ellipse cx="868" cy="146" rx="2.4" ry="1" transform="rotate(-9 868 146)"/>
+        </g>
+
+        <!-- traveler -->
+        <g transform="translate(908 136) scale(1.22)">
+          <ellipse cx="0" cy="8" rx="24" ry="4" fill="#000" opacity="0.30" filter="url(#jsoft)"/>
+          <path d="M-8 -30 C -4 -36 6 -35 8 -28 L6 -25 L-6 -25Z" fill="#121b1d"/>
+          <circle cx="0" cy="-34" r="3.4" fill="#0a1117"/>
+          <path d="M-2 -30 C -8 -27 -9 -17 -6 -10 L-2 -3 L6 -3 L7 -12 C 9 -20 6 -27 3 -30Z" fill="#0b1319"/>
+          <path d="M-3 -28 C -11 -27 -15 -18 -14 -9 L-9 -8 L-8 -18 L-4 -21Z" fill="#203039"/>
+          <path d="M-5 -12 L-9 5 L-4 5 L0 -8 L4 5 L9 4 L6 -13Z" fill="#0a1117"/>
+          <path d="M-12 -10 L-15 7" stroke="#0a1117" stroke-width="2" stroke-linecap="round"/>
+          <path d="M6 -24 L12 -6" stroke="#0a1117" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M-5 -28 C 0 -25 1 -21 0 -17 C 4 -18 7 -20 8 -23" fill="none" stroke="#a66d4e" stroke-width="1.4" opacity="0.75"/>
+          <circle cx="13" cy="-6" r="15" fill="url(#jlantern)" filter="url(#jblur)"/>
+          <circle cx="13" cy="-6" r="2.8" fill="#f4c27c"/>
+          <path d="M11 -9 L15 -9 L14 -3 L12 -3Z" fill="#f6d49b" opacity="0.8"/>
+          <path d="M-1 -34 C 2 -37 5 -35 5 -32" fill="none" stroke="#8b9b91" stroke-width="0.8" opacity="0.4"/>
+        </g>
+
+        <!-- foreground grasses -->
+        <g stroke="#0a1719" stroke-width="1.4" fill="none" opacity="0.9">
+          <path d="M18 153 C 16 141 21 134 28 129"/>
+          <path d="M28 154 C 30 143 35 137 42 133"/>
+          <path d="M1250 153 C 1246 143 1250 136 1257 131"/>
+          <path d="M1264 154 C 1268 143 1274 138 1281 134"/>
+          <path d="M1298 155 C 1294 146 1298 140 1304 136"/>
+          <path d="M560 153 C 557 146 560 141 565 137"/>
+        </g>
+
+        <g stroke="#385047" stroke-width="1" fill="none" opacity="0.55">
+          <path d="M468 154 C 466 147 470 142 475 139"/>
+          <path d="M478 155 C 480 149 484 145 488 143"/>
+          <path d="M702 155 C 700 148 704 144 709 141"/>
+          <path d="M716 156 C 718 150 722 147 726 145"/>
+          <path d="M1044 156 C 1042 150 1046 146 1050 143"/>
+          <path d="M1140 155 C 1138 149 1142 145 1146 142"/>
+          <path d="M1166 156 C 1168 150 1171 147 1175 145"/>
+        </g>
+
+        <g fill="#28342f" opacity="0.75">
+          <ellipse cx="492" cy="156" rx="4" ry="1.6"/>
+          <ellipse cx="738" cy="154" rx="3" ry="1.3"/>
+          <ellipse cx="1108" cy="157" rx="5" ry="1.8"/>
+          <ellipse cx="1192" cy="155" rx="3.5" ry="1.4"/>
+        </g>
+
+        <!-- fog -->
+        <ellipse cx="500" cy="128" rx="300" ry="17" fill="#b9d1d1" opacity="0.04" filter="url(#jblur)"/>
+        <ellipse cx="1020" cy="121" rx="240" ry="13" fill="#b9d1d1" opacity="0.035" filter="url(#jblur)"/>
+      </g>
+    </svg>
+
+    <div class="journey-ui">
+      <div class="journey-place">
+        <i class="pin"></i>
+        <b>雾之谷</b>
+        <span>第 27 天 · 向晚</span>
+      </div>
+      <div class="journey-meta">
+        <span><i></i>顺风</span>
+        <span>20:16</span>
+      </div>
+    </div>
+
+    <div class="route">
+      <span class="done"></span><span class="done"></span><span class="done"></span>
+      <span class="now"></span>
+      <span class="route-line"></span>
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <div class="footer-mark">NORMAL WORK IS THE CONTROLLER</div>
+  <div class="grain"></div>
+  <div class="vignette"></div>
+</div>
+</body>
+</html>

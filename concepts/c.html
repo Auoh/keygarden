@@ -1,0 +1,905 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>概念 C · 键盘小镇</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .work { top: 220px; width: 800px; height: 560px; }
+
+  .town-panel {
+    position: absolute;
+    right: 64px;
+    top: 138px;
+    z-index: 27;
+    width: 430px;
+    height: 652px;
+    padding: 20px 20px 17px;
+    overflow: hidden;
+    border: 1px solid rgba(247, 221, 181, 0.14);
+    border-radius: 24px;
+    background:
+      radial-gradient(420px 260px at 70% 0%, rgba(222, 160, 91, 0.09), transparent 65%),
+      linear-gradient(180deg, rgba(18, 24, 30, 0.97), rgba(8, 12, 16, 0.98));
+    box-shadow:
+      0 40px 95px rgba(0, 0, 0, 0.60),
+      0 0 80px rgba(211, 145, 76, 0.09),
+      inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  }
+
+  .town-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+    border-radius: 24px;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 235, 203, 0.035),
+      inset 0 -70px 90px rgba(4, 8, 12, 0.28);
+  }
+
+  .town-head {
+    position: relative;
+    z-index: 3;
+    padding: 2px 2px 12px;
+  }
+
+  .town-kicker {
+    color: #6f8179;
+    font-family: Consolas, monospace;
+    font-size: 7px;
+    letter-spacing: 0.22em;
+  }
+
+  .town-title-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+
+  .town-lights {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+  }
+
+  .town-number {
+    color: #f4cd8d;
+    font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
+    font-size: 35px;
+    font-weight: 300;
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    text-shadow: 0 0 24px rgba(244, 188, 104, 0.24);
+  }
+
+  .town-unit {
+    color: #8f9a8f;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+  }
+
+  .town-night {
+    text-align: right;
+    color: #afb8ac;
+    font-size: 9px;
+    line-height: 1.8;
+    letter-spacing: 0.12em;
+  }
+
+  .town-night b {
+    color: #e5d9be;
+    font-family: Consolas, monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.10em;
+  }
+
+  .town-night .moon-dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    margin-right: 5px;
+    border-radius: 50%;
+    background: #e7d6ac;
+    box-shadow: 0 0 8px rgba(231, 214, 172, 0.55);
+    vertical-align: 1px;
+  }
+
+  .town-art {
+    position: relative;
+    z-index: 2;
+    width: 390px;
+    height: 400px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 232, 195, 0.08);
+    border-radius: 15px;
+    background: #08101a;
+    box-shadow:
+      inset 0 0 45px rgba(0, 0, 0, 0.48),
+      0 12px 30px rgba(0, 0, 0, 0.28);
+  }
+
+  .town-art::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(115deg, rgba(255, 243, 216, 0.05), transparent 35%),
+      linear-gradient(to bottom, rgba(3, 7, 11, 0.28), transparent 22%, transparent 72%, rgba(3, 7, 11, 0.5));
+  }
+
+  .town-art svg {
+    display: block;
+    width: 390px;
+    height: 400px;
+  }
+
+  .town-foot {
+    position: relative;
+    z-index: 3;
+    padding-top: 13px;
+  }
+
+  .res-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: #8c9a90;
+    font-family: Consolas, monospace;
+    font-size: 8px;
+    letter-spacing: 0.08em;
+  }
+
+  .res {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .res i {
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 1px;
+    background: #927b5e;
+  }
+
+  .res:nth-child(2) i { background: #6d7d7e; }
+  .res:nth-child(3) i { background: #e5b66e; box-shadow: 0 0 6px rgba(229, 182, 110, 0.35); }
+
+  .res-row .next {
+    margin-left: auto;
+    color: #6f7d74;
+    letter-spacing: 0.1em;
+  }
+
+  .res-row .next b {
+    color: #d5c3a2;
+    font-weight: 400;
+  }
+
+  .bp-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 13px 0 8px;
+    color: #8f9c93;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+  }
+
+  .bp-head span {
+    color: #68766f;
+    font-family: Consolas, monospace;
+    font-size: 7px;
+    letter-spacing: 0.1em;
+  }
+
+  .blueprints {
+    display: flex;
+    gap: 8px;
+  }
+
+  .bp {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 59px;
+    padding: 8px 9px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.025);
+    color: #8f9d94;
+  }
+
+  .bp.selected {
+    border-color: rgba(233, 191, 125, 0.46);
+    background:
+      linear-gradient(135deg, rgba(232, 183, 109, 0.10), rgba(232, 183, 109, 0.02));
+    box-shadow: 0 0 20px rgba(224, 167, 91, 0.07), inset 0 0 0 1px rgba(255, 231, 194, 0.03);
+  }
+
+  .bp-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 27px;
+    width: 27px;
+    height: 32px;
+    color: #b5a17f;
+  }
+
+  .bp.selected .bp-icon { color: #f0c88a; }
+
+  .bp-icon svg { width: 25px; height: 30px; }
+
+  .bp b {
+    display: block;
+    color: #b9beb1;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  .bp.selected b { color: #f0dfc4; }
+
+  .bp small {
+    display: block;
+    margin-top: 3px;
+    color: #68766e;
+    font-family: Consolas, monospace;
+    font-size: 6px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .bp.selected small { color: #ad997e; }
+
+  .town-hint {
+    margin-top: 8px;
+    color: #59665f;
+    font-family: "KaiTi", "STKaiti", serif;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-align: right;
+  }
+
+  .footer-mark {
+    position: absolute;
+    left: 64px;
+    bottom: 28px;
+    z-index: 30;
+    color: #566b63;
+    font-family: Consolas, monospace;
+    font-size: 8px;
+    letter-spacing: 0.19em;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="ambient"></div>
+  <div class="grid"></div>
+
+  <div class="title">
+    <div class="eyebrow">Ambient keyboard game · concept C</div>
+    <h1>键盘小镇</h1>
+    <div class="sub">每一下敲击，亮一盏灯。</div>
+    <div class="chips">
+      <span class="chip">经营成长</span>
+      <span class="chip">每天一个蓝图</span>
+      <span class="chip">信息更多</span>
+    </div>
+  </div>
+
+  <div class="index">
+    <b>C / 03</b><br>
+    KEY TOWN<br>
+    1440 × 900
+  </div>
+
+  <div class="work">
+    <div class="workbar">
+      <div class="traffic"><i></i><i></i><i></i></div>
+      <div class="work-title">季度复盘 — 第三季度</div>
+      <div class="work-right">已同步 · 23:10</div>
+    </div>
+    <div class="workbody">
+      <div class="workrail">
+        <div class="rail-icon active"></div>
+        <div class="rail-icon"></div>
+        <div class="rail-icon"></div>
+        <div class="rail-icon"></div>
+        <div class="rail-icon"></div>
+      </div>
+      <div class="workpaper">
+        <div class="paper-kicker">REVIEW / Q3 / DRAFT 04</div>
+        <div class="paper-h">第三季度复盘与来年方向</div>
+        <div class="paper-meta">最后编辑 5 分钟前 · 共享给 6 人</div>
+        <div class="paper-rule"></div>
+        <div class="line hl" style="width: 86%;"></div>
+        <div class="line" style="width: 75%;"></div>
+        <div class="line" style="width: 92%;"></div>
+        <div class="line" style="width: 61%;"></div>
+        <div class="line hl" style="width: 80%; margin-top: 24px;"></div>
+        <div class="line" style="width: 69%;"></div>
+        <div class="line" style="width: 88%;"></div>
+        <div class="work-table">
+          <div></div><div></div><div></div><div></div>
+          <div></div><div></div><div></div><div></div>
+          <div></div><div></div><div></div><div></div>
+          <div></div><div></div><div></div><div></div>
+        </div>
+        <div class="work-note">“灯一盏一盏亮起来的时候，城市才开始呼吸。”</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="town-panel">
+    <div class="town-head">
+      <div class="town-kicker">KEY TOWN / NIGHT SHIFT / 第 18 夜</div>
+      <div class="town-title-row">
+        <div class="town-lights">
+          <span class="town-number">1,284</span>
+          <span class="town-unit">盏灯亮着</span>
+        </div>
+        <div class="town-night">
+          <span class="moon-dot"></span><b>23:10</b><br>
+          今夜 · 微风
+        </div>
+      </div>
+    </div>
+
+    <div class="town-art">
+      <svg id="town" viewBox="0 0 390 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="一座由打字灯光点亮的等距像素小镇">
+        <defs>
+          <linearGradient id="tSky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#07101b"/>
+            <stop offset="0.52" stop-color="#0c1d2b"/>
+            <stop offset="1" stop-color="#162b33"/>
+          </linearGradient>
+          <linearGradient id="tGround" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#17251f"/>
+            <stop offset="1" stop-color="#09120f"/>
+          </linearGradient>
+          <linearGradient id="tWater" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1e4149"/>
+            <stop offset="0.45" stop-color="#102932"/>
+            <stop offset="1" stop-color="#08161c"/>
+          </linearGradient>
+          <radialGradient id="tMoonHalo">
+            <stop offset="0" stop-color="#f7e6bb" stop-opacity="0.42"/>
+            <stop offset="0.42" stop-color="#d9dfbe" stop-opacity="0.12"/>
+            <stop offset="1" stop-color="#d9dfbe" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="tLampGlow">
+            <stop offset="0" stop-color="#ffd18b" stop-opacity="0.9"/>
+            <stop offset="0.24" stop-color="#f0ae64" stop-opacity="0.45"/>
+            <stop offset="1" stop-color="#e8a15a" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="tFireGlow">
+            <stop offset="0" stop-color="#ffdc9d" stop-opacity="0.85"/>
+            <stop offset="0.45" stop-color="#e89a51" stop-opacity="0.20"/>
+            <stop offset="1" stop-color="#e89a51" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="tBlur" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="7"/>
+          </filter>
+          <filter id="tSoft" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="2.2"/>
+          </filter>
+          <filter id="tGlow" x="-120%" y="-120%" width="340%" height="340%">
+            <feGaussianBlur stdDeviation="2.6" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <clipPath id="tClip"><rect width="390" height="400" rx="15"/></clipPath>
+        </defs>
+
+        <g clip-path="url(#tClip)">
+          <rect width="390" height="400" fill="url(#tSky)"/>
+
+          <!-- moon and stars -->
+          <circle cx="314" cy="57" r="79" fill="url(#tMoonHalo)"/>
+          <circle cx="314" cy="57" r="23" fill="#f1e3b8"/>
+          <circle cx="307" cy="50" r="4" fill="#e4d09f" opacity="0.42"/>
+          <circle cx="322" cy="66" r="2.6" fill="#e4d09f" opacity="0.34"/>
+          <g fill="#d9e4d7">
+            <circle cx="41" cy="38" r="0.8" opacity="0.38"/>
+            <circle cx="86" cy="72" r="0.6" opacity="0.24"/>
+            <circle cx="132" cy="33" r="0.9" opacity="0.32"/>
+            <circle cx="178" cy="61" r="0.6" opacity="0.22"/>
+            <circle cx="236" cy="29" r="0.7" opacity="0.30"/>
+            <circle cx="270" cy="92" r="0.6" opacity="0.22"/>
+            <circle cx="349" cy="26" r="0.8" opacity="0.34"/>
+            <circle cx="365" cy="93" r="0.6" opacity="0.22"/>
+            <circle cx="18" cy="105" r="0.6" opacity="0.20"/>
+          </g>
+
+          <!-- distant ridge -->
+          <path d="M0 172 C 34 148 70 158 102 148 C 138 137 169 156 202 150 C 240 143 260 158 292 149 C 326 139 358 151 390 142 L390 400 L0 400Z" fill="#0a171c"/>
+          <path d="M0 191 C 48 174 85 186 121 178 C 166 168 201 185 238 179 C 286 171 319 188 352 181 C 369 177 382 180 390 176 L390 400 L0 400Z" fill="#0b1a19"/>
+
+          <!-- hot air balloon -->
+          <g transform="translate(76 72)" opacity="0.82">
+            <path d="M0 18 C -17 18 -25 6 -25 -6 C -25 -20 -13 -28 0 -28 C 13 -28 25 -20 25 -6 C 25 6 17 18 0 18Z" fill="#805542"/>
+            <path d="M0 18 C -7 18 -10 9 -10 -3 C -10 -16 -5 -28 0 -28 C 5 -28 10 -16 10 -3 C 10 9 7 18 0 18Z" fill="#b07655" opacity="0.72"/>
+            <path d="M-6 19 L-4 26 L4 26 L6 19Z" fill="#5f4438"/>
+            <path d="M-3 26 L0 31 L3 26Z" fill="#bd8759"/>
+            <path d="M0 31 L0 35" stroke="#755846" stroke-width="0.8"/>
+            <circle cx="0" cy="35" r="1.3" fill="#f4bd78"/>
+            <circle cx="0" cy="35" r="7" fill="url(#tFireGlow)"/>
+          </g>
+
+          <g id="tGroundLayer"></g>
+          <g id="tTownLayer"></g>
+          <g id="tFrontLayer"></g>
+          <g id="tWaterLayer"></g>
+
+          <!-- foreground mist -->
+          <ellipse cx="195" cy="335" rx="210" ry="22" fill="#adc7c1" opacity="0.035" filter="url(#tBlur)"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="town-foot">
+      <div class="res-row">
+        <span class="res"><i></i>木 42</span>
+        <span class="res"><i></i>石 18</span>
+        <span class="res"><i></i>灯火 7</span>
+        <span class="next">明日蓝图 <b>三选一</b></span>
+      </div>
+
+      <div class="bp-head">
+        <span>下班后，决定小镇往哪长</span>
+        <span>01 / 03</span>
+      </div>
+
+      <div class="blueprints">
+        <div class="bp">
+          <span class="bp-icon">
+            <svg viewBox="0 0 25 30" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M5 28V13L12.5 5L20 13V28H5Z"/>
+              <path d="M9 28V18H16V28" opacity="0.7"/>
+              <path d="M12.5 5V1" opacity="0.8"/>
+              <path d="M10 1h5" opacity="0.6"/>
+            </svg>
+          </span>
+          <span><b>钟楼</b><small>+ 节律</small></span>
+        </div>
+        <div class="bp">
+          <span class="bp-icon">
+            <svg viewBox="0 0 25 30" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M2 22L12.5 13L23 22"/>
+              <path d="M3 22h19l-2 5H5Z"/>
+              <path d="M7 25h11" opacity="0.7"/>
+              <path d="M12.5 13V7M12.5 7l3-2M12.5 7l-3-2" opacity="0.8"/>
+            </svg>
+          </span>
+          <span><b>夜市</b><small>+ 灯火</small></span>
+        </div>
+        <div class="bp selected">
+          <span class="bp-icon">
+            <svg viewBox="0 0 25 30" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M3 14L12.5 5L22 14V25H3Z"/>
+              <path d="M7 25V17H18V25M7 17L12.5 21L18 17" opacity="0.75"/>
+              <path d="M3 25h19" opacity="0.6"/>
+            </svg>
+          </span>
+          <span><b>玻璃房</b><small>+ 新芽</small></span>
+        </div>
+      </div>
+
+      <div class="town-hint">今晚的灯，都是你白天敲出来的。</div>
+    </div>
+  </div>
+
+  <div class="footer-mark">NORMAL WORK IS THE CONTROLLER</div>
+  <div class="grain"></div>
+  <div class="vignette"></div>
+</div>
+
+<script>
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const root = document.getElementById("town");
+  const gGround = document.getElementById("tGroundLayer");
+  const gTown = document.getElementById("tTownLayer");
+  const gFront = document.getElementById("tFrontLayer");
+  const gWater = document.getElementById("tWaterLayer");
+
+  const CX = 195, CY = 154, SX = 16.5, SY = 9.1, SZ = 15.2;
+
+  function P(x, y, z = 0) {
+    return [CX + (x - y) * SX, CY + (x + y) * SY - z * SZ];
+  }
+
+  function el(tag, attrs = {}, parent = gTown) {
+    const node = document.createElementNS(NS, tag);
+    for (const [key, value] of Object.entries(attrs)) {
+      if (value !== undefined && value !== null) node.setAttribute(key, value);
+    }
+    parent.appendChild(node);
+    return node;
+  }
+
+  function poly(points, fill, attrs = {}, parent = gTown) {
+    return el("polygon", {
+      points: points.map(p => p.join(",")).join(" "),
+      fill,
+      ...attrs
+    }, parent);
+  }
+
+  function line(x1, y1, x2, y2, stroke, width = 1, attrs = {}, parent = gTown) {
+    return el("line", { x1, y1, x2, y2, stroke, "stroke-width": width, ...attrs }, parent);
+  }
+
+  function shade(hex, amount) {
+    const n = parseInt(hex.slice(1), 16);
+    let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    if (amount >= 0) {
+      r += (255 - r) * amount;
+      g += (255 - g) * amount;
+      b += (255 - b) * amount;
+    } else {
+      r *= 1 + amount;
+      g *= 1 + amount;
+      b *= 1 + amount;
+    }
+    return "#" + [r, g, b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0")).join("");
+  }
+
+  let seed = 20261025;
+  function rnd() {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 4294967296;
+  }
+
+  // ---------- ground ----------
+  const groundDiamond = [P(0, 0), P(9, 0), P(9, 9), P(0, 9)];
+  poly(groundDiamond, "url(#tGround)", { opacity: 0.98 }, gGround);
+
+  // subtle isometric block lines
+  for (let i = 1; i < 9; i++) {
+    line(...P(i, 0), ...P(i, 9), "#b4c8ae", 0.7, { opacity: 0.045 }, gGround);
+    line(...P(0, i), ...P(9, i), "#b4c8ae", 0.7, { opacity: 0.045 }, gGround);
+  }
+
+  // two streets
+  line(...P(0, 4.15), ...P(9, 4.15), "#16251f", 17, { opacity: 0.9, "stroke-linecap": "round" }, gGround);
+  line(...P(4.55, 0), ...P(4.55, 9), "#16251f", 17, { opacity: 0.9, "stroke-linecap": "round" }, gGround);
+  line(...P(0, 4.15), ...P(9, 4.15), "#5f6d55", 0.8, { opacity: 0.18, "stroke-dasharray": "2 8" }, gGround);
+  line(...P(4.55, 0), ...P(4.55, 9), "#5f6d55", 0.8, { opacity: 0.14, "stroke-dasharray": "2 8" }, gGround);
+
+  // little plaza
+  const plaza = [P(4.0, 4.0), P(5.1, 4.0), P(5.1, 5.1), P(4.0, 5.1)];
+  poly(plaza, "#1c2b23", { opacity: 0.9 }, gGround);
+  poly([P(4.35, 4.35), P(4.85, 4.35), P(4.85, 4.85), P(4.35, 4.85)], "#2f3a2a", { opacity: 0.7 }, gGround);
+
+  // ground rim
+  el("polygon", {
+    points: groundDiamond.map(p => p.join(",")).join(" "),
+    fill: "none",
+    stroke: "#68806a",
+    "stroke-width": 1,
+    opacity: 0.12
+  }, gGround);
+
+  // ---------- buildings ----------
+  const buildings = [
+    { x: 0.7, y: 3.05, w: 1.15, d: 1.15, h: 2.2, c: "#2a3330", roof: "#394238", terrace: true },
+    { x: 1.35, y: 1.15, w: 1.35, d: 1.10, h: 3.0, c: "#31383a", roof: "#42463f" },
+    { x: 3.35, y: 0.75, w: 1.15, d: 1.10, h: 2.45, c: "#2b3439", roof: "#3b4544" },
+    { x: 5.55, y: 0.85, w: 1.42, d: 1.15, h: 2.75, c: "#3b3334", roof: "#5b4640" },
+    { x: 7.15, y: 1.55, w: 1.05, d: 1.05, h: 2.15, c: "#293135", roof: "#383f3e" },
+    { x: 2.35, y: 2.55, w: 1.35, d: 1.28, h: 5.05, c: "#373838", roof: "#4b473e", clock: true },
+    { x: 4.75, y: 2.35, w: 1.35, d: 1.10, h: 3.30, c: "#2c373b", roof: "#35504b" },
+    { x: 6.65, y: 3.25, w: 1.35, d: 1.18, h: 2.55, c: "#3b3436", roof: "#4b4140" },
+    { x: 1.55, y: 5.25, w: 1.55, d: 1.15, h: 2.20, c: "#3b3a33", roof: "#4d4c3c" },
+    { x: 3.75, y: 5.30, w: 1.38, d: 1.10, h: 2.65, c: "#3b383a", roof: "#4a4441" },
+    { x: 6.15, y: 5.65, w: 1.30, d: 1.10, h: 1.95, c: "#36312f", roof: "#513c38" },
+    { x: 2.55, y: 7.10, w: 1.20, d: 0.95, h: 1.75, c: "#353b36", roof: "#454b40" }
+  ].sort((a, b) => (a.x + a.y + (a.w + a.d) * 0.15) - (b.x + b.y + (b.w + b.d) * 0.15));
+
+  function addWindows(b, frontColor) {
+    const cols = b.w > 1.35 ? 3 : 2;
+    const rows = Math.max(1, Math.floor((b.h - 0.55) / 0.58));
+    const litColor = "#ffc472";
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const wx = b.x + 0.20 + c * ((b.w - 0.40) / cols);
+        const wz = 0.56 + r * 0.58;
+        if (wz + 0.26 > b.h - 0.15) continue;
+        if (rnd() > 0.68) continue;
+        const pts = [
+          P(wx, b.y + b.d, wz),
+          P(wx + 0.155, b.y + b.d, wz),
+          P(wx + 0.155, b.y + b.d, wz + 0.26),
+          P(wx, b.y + b.d, wz + 0.26)
+        ];
+        poly(pts, litColor, { opacity: 0.18, filter: "url(#tSoft)" }, gTown);
+        poly(pts, litColor, { opacity: rnd() > 0.8 ? 0.55 : 0.88 }, gTown);
+        poly([
+          P(wx + 0.02, b.y + b.d, wz + 0.13),
+          P(wx + 0.135, b.y + b.d, wz + 0.13),
+          P(wx + 0.135, b.y + b.d, wz + 0.15),
+          P(wx + 0.02, b.y + b.d, wz + 0.15)
+        ], "#563b27", { opacity: 0.55 }, gTown);
+      }
+    }
+
+    // side-face windows
+    const sideRows = Math.max(1, Math.floor((b.h - 0.7) / 0.62));
+    for (let r = 0; r < sideRows; r++) {
+      const wz = 0.65 + r * 0.62;
+      if (wz + 0.22 > b.h - 0.2) continue;
+      if (rnd() > 0.62) continue;
+      const pts = [
+        P(b.x + b.w, b.y + 0.22, wz),
+        P(b.x + b.w, b.y + 0.42, wz),
+        P(b.x + b.w, b.y + 0.42, wz + 0.22),
+        P(b.x + b.w, b.y + 0.22, wz + 0.22)
+      ];
+      poly(pts, litColor, { opacity: 0.16, filter: "url(#tSoft)" }, gTown);
+      poly(pts, litColor, { opacity: 0.62 }, gTown);
+    }
+  }
+
+  function chimney(b) {
+    const cx = b.x + b.w * 0.68;
+    const cy = b.y + b.d * 0.42;
+    const base = b.h;
+    const top = base + 0.65;
+    const w = 0.20, d = 0.18;
+    poly([P(cx, cy, top), P(cx + w, cy, top), P(cx + w, cy + d, top), P(cx, cy + d, top)], shade(b.roof, 0.18), {}, gTown);
+    poly([P(cx, cy + d, base), P(cx + w, cy + d, base), P(cx + w, cy + d, top), P(cx, cy + d, top)], shade(b.roof, -0.12), {}, gTown);
+    poly([P(cx + w, cy, base), P(cx + w, cy + d, base), P(cx + w, cy + d, top), P(cx + w, cy, top)], shade(b.roof, -0.28), {}, gTown);
+  }
+
+  for (const b of buildings) {
+    const front = b.c;
+    const side = shade(front, -0.34);
+    const roof = b.roof || shade(front, 0.22);
+
+    // shadow
+    poly([
+      P(b.x + 0.08, b.y + b.d + 0.12, 0),
+      P(b.x + b.w + 0.22, b.y + b.d + 0.24, 0),
+      P(b.x + b.w + 0.22, b.y + b.d + 0.54, 0),
+      P(b.x + 0.08, b.y + b.d + 0.42, 0)
+    ], "#000", { opacity: 0.28 }, gGround);
+
+    // side face
+    poly([
+      P(b.x + b.w, b.y, 0),
+      P(b.x + b.w, b.y + b.d, 0),
+      P(b.x + b.w, b.y + b.d, b.h),
+      P(b.x + b.w, b.y, b.h)
+    ], side, {}, gTown);
+
+    // front face
+    poly([
+      P(b.x, b.y + b.d, 0),
+      P(b.x + b.w, b.y + b.d, 0),
+      P(b.x + b.w, b.y + b.d, b.h),
+      P(b.x, b.y + b.d, b.h)
+    ], front, {}, gTown);
+
+    // roof
+    poly([
+      P(b.x, b.y, b.h),
+      P(b.x + b.w, b.y, b.h),
+      P(b.x + b.w, b.y + b.d, b.h),
+      P(b.x, b.y + b.d, b.h)
+    ], roof, {}, gTown);
+
+    // roof edge
+    el("polyline", {
+      points: [P(b.x, b.y, b.h), P(b.x + b.w, b.y, b.h), P(b.x + b.w, b.y + b.d, b.h), P(b.x, b.y + b.d, b.h), P(b.x, b.y, b.h)].map(p => p.join(",")).join(" "),
+      fill: "none",
+      stroke: shade(roof, 0.22),
+      "stroke-width": 0.8,
+      opacity: 0.6
+    }, gTown);
+
+    // door
+    const dx = b.x + b.w * 0.45;
+    poly([
+      P(dx, b.y + b.d, 0.04),
+      P(dx + 0.22, b.y + b.d, 0.04),
+      P(dx + 0.22, b.y + b.d, 0.48),
+      P(dx, b.y + b.d, 0.48)
+    ], "#141b18", { opacity: 0.95 }, gTown);
+    poly([
+      P(dx + 0.03, b.y + b.d, 0.06),
+      P(dx + 0.19, b.y + b.d, 0.06),
+      P(dx + 0.19, b.y + b.d, 0.39),
+      P(dx + 0.03, b.y + b.d, 0.39)
+    ], "#d79a56", { opacity: 0.46 }, gTown);
+
+    addWindows(b, front);
+
+    if (b.clock) {
+      const [tx, ty] = P(b.x + b.w * 0.50, b.y + b.d, b.h - 0.92);
+      el("circle", { cx: tx, cy: ty, r: 9.5, fill: "#f0d7a4", opacity: 0.92 }, gTown);
+      el("circle", { cx: tx, cy: ty, r: 10.8, fill: "none", stroke: "#5f4d38", "stroke-width": 1, opacity: 0.8 }, gTown);
+      line(tx, ty, tx, ty - 6, "#5b4a37", 1.1, {}, gTown);
+      line(tx, ty, tx + 4.5, ty + 1.5, "#5b4a37", 1, {}, gTown);
+      el("circle", { cx: tx, cy: ty, r: 1.1, fill: "#5b4a37" }, gTown);
+      el("line", { x1: tx, y1: ty - 16, x2: tx, y2: ty - 11, stroke: "#7c6e59", "stroke-width": 1 }, gTown);
+      el("circle", { cx: tx, cy: ty - 16, r: 1.3, fill: "#e8b974" }, gTown);
+    } else {
+      if (rnd() > 0.46) chimney(b);
+      if (b.terrace) {
+        const [gx, gy] = P(b.x + b.w * 0.55, b.y + b.d * 0.45, b.h + 0.02);
+        el("ellipse", { cx: gx, cy: gy, rx: 10, ry: 5, fill: "#33503a" }, gTown);
+        el("circle", { cx: gx - 4, cy: gy - 3, r: 3.8, fill: "#416646" }, gTown);
+        el("circle", { cx: gx + 3, cy: gy - 1, r: 3, fill: "#35583e" }, gTown);
+      }
+    }
+  }
+
+  // ---------- chimney smoke ----------
+  for (const [x, y, h, drift] of [[1.95, 1.72, 3.35, -12], [5.95, 2.05, 3.15, 9]]) {
+    const [sx, sy] = P(x, y, h);
+    el("path", {
+      d: `M${sx} ${sy} C ${sx - 8} ${sy - 13} ${sx + drift + 8} ${sy - 26} ${sx + drift} ${sy - 43}`,
+      fill: "none",
+      stroke: "#b8c8bf",
+      "stroke-width": 8,
+      opacity: 0.055,
+      filter: "url(#tBlur)"
+    }, gTown);
+    el("path", {
+      d: `M${sx} ${sy} C ${sx - 5} ${sy - 11} ${sx + drift + 4} ${sy - 22} ${sx + drift - 2} ${sy - 34}`,
+      fill: "none",
+      stroke: "#d2dfd4",
+      "stroke-width": 2.2,
+      opacity: 0.08,
+      filter: "url(#tSoft)"
+    }, gTown);
+  }
+
+  // ---------- trees ----------
+  function tree(x, y, scale = 1, parent = gFront) {
+    const [tx, ty] = P(x, y, 0);
+    el("ellipse", { cx: tx, cy: ty + 1, rx: 11 * scale, ry: 4 * scale, fill: "#000", opacity: 0.22 }, parent);
+    el("line", { x1: tx, y1: ty, x2: tx, y2: ty - 14 * scale, stroke: "#26372c", "stroke-width": 2 * scale }, parent);
+    el("circle", { cx: tx - 4 * scale, cy: ty - 18 * scale, r: 9 * scale, fill: "#1d392f" }, parent);
+    el("circle", { cx: tx + 5 * scale, cy: ty - 15 * scale, r: 7 * scale, fill: "#224134" }, parent);
+    el("circle", { cx: tx, cy: ty - 25 * scale, r: 8 * scale, fill: "#294b39" }, parent);
+    el("circle", { cx: tx - 4 * scale, cy: ty - 27 * scale, r: 4 * scale, fill: "#4f7252", opacity: 0.35 }, parent);
+    el("circle", { cx: tx + 6 * scale, cy: ty - 20 * scale, r: 3 * scale, fill: "#5b7f5e", opacity: 0.25 }, parent);
+  }
+
+  tree(0.55, 6.4, 1.05, gFront);
+  tree(8.15, 5.0, 0.9, gFront);
+  tree(8.25, 0.75, 0.75, gTown);
+  tree(2.0, 2.05, 0.55, gTown);
+  tree(7.1, 4.75, 0.55, gTown);
+  tree(5.6, 6.7, 0.7, gFront);
+
+  // ---------- lamps ----------
+  function lamp(x, y, parent = gFront, scale = 1) {
+    const [lx, ly] = P(x, y, 0);
+    const top = ly - 29 * scale;
+    el("ellipse", { cx: lx, cy: ly + 1, rx: 12, ry: 4, fill: "#e5b66e", opacity: 0.07, filter: "url(#tBlur)" }, parent);
+    el("line", { x1: lx, y1: ly, x2: lx, y2: top, stroke: "#3f4940", "stroke-width": 1.3 }, parent);
+    el("circle", { cx: lx, cy: top, r: 15, fill: "url(#tLampGlow)" }, parent);
+    el("circle", { cx: lx, cy: top, r: 2.2, fill: "#ffd293" }, parent);
+    el("path", { d: `M${lx - 4} ${top + 1} L${lx + 4} ${top + 1} L${lx + 2.5} ${top + 6} L${lx - 2.5} ${top + 6}Z`, fill: "#5b4a37", opacity: 0.9 }, parent);
+  }
+
+  lamp(4.82, 4.05, gFront, 0.9);
+  lamp(3.60, 4.95, gFront, 0.8);
+  lamp(7.45, 2.55, gTown, 0.72);
+  lamp(0.95, 4.35, gTown, 0.66);
+
+  // ---------- plaza fountain ----------
+  const [fx, fy] = P(4.55, 4.55, 0);
+  el("ellipse", { cx: fx, cy: fy + 1, rx: 18, ry: 9, fill: "#0a1410", opacity: 0.65 }, gFront);
+  el("ellipse", { cx: fx, cy: fy - 1, rx: 15, ry: 7, fill: "#2b3b32" }, gFront);
+  el("ellipse", { cx: fx, cy: fy - 2, rx: 11, ry: 5, fill: "#285a54" }, gFront);
+  el("ellipse", { cx: fx, cy: fy - 2, rx: 8, ry: 3.4, fill: "#4b9188", opacity: 0.8 }, gFront);
+  el("circle", { cx: fx, cy: fy - 4, r: 17, fill: "url(#tLampGlow)", opacity: 0.18 }, gFront);
+  el("line", { x1: fx, y1: fy - 4, x2: fx, y2: fy - 17, stroke: "#7fb7a8", "stroke-width": 1, opacity: 0.7 }, gFront);
+  el("path", { d: `M${fx - 3} ${fy - 15} C ${fx - 6} ${fy - 9} ${fx - 7} ${fy - 7} ${fx - 8} ${fy - 4}`, fill: "none", stroke: "#a8d6c4", "stroke-width": 0.7, opacity: 0.55 }, gFront);
+  el("path", { d: `M${fx + 3} ${fy - 15} C ${fx + 7} ${fy - 9} ${fx + 8} ${fy - 7} ${fx + 9} ${fy - 4}`, fill: "none", stroke: "#a8d6c4", "stroke-width": 0.7, opacity: 0.55 }, gFront);
+
+  // ---------- string lights over the plaza ----------
+  const [lx1, ly1] = P(4.82, 4.05, 0);
+  const [lx2, ly2] = P(3.60, 4.95, 0);
+  const ax = lx1, ay = ly1 - 26;
+  const bx = lx2, by = ly2 - 23;
+  const cx = (ax + bx) / 2, cy = (ay + by) / 2 + 13;
+  el("path", { d: `M${ax} ${ay} Q ${cx} ${cy} ${bx} ${by}`, fill: "none", stroke: "#5f5241", "stroke-width": 0.8, opacity: 0.55 }, gFront);
+  for (let i = 1; i <= 7; i++) {
+    const t = i / 8;
+    const px = (1 - t) * (1 - t) * ax + 2 * (1 - t) * t * cx + t * t * bx;
+    const py = (1 - t) * (1 - t) * ay + 2 * (1 - t) * t * cy + t * t * by;
+    el("circle", { cx: px, cy: py, r: 4.5, fill: "url(#tLampGlow)", opacity: 0.6 }, gFront);
+    el("circle", { cx: px, cy: py, r: 1.1, fill: "#ffd79a" }, gFront);
+  }
+
+  // ---------- canal / foreground water ----------
+  el("path", {
+    d: "M0 330 C 65 322 122 327 190 325 C 265 323 323 327 390 318 L390 400 L0 400Z",
+    fill: "#08141a"
+  }, gWater);
+  el("path", {
+    d: "M0 337 C 70 330 130 335 196 333 C 270 331 326 334 390 326 L390 400 L0 400Z",
+    fill: "url(#tWater)"
+  }, gWater);
+
+  // stone edge
+  el("path", {
+    d: "M0 330 C 65 322 122 327 190 325 C 265 323 323 327 390 318",
+    fill: "none",
+    stroke: "#6c735e",
+    "stroke-width": 3,
+    opacity: 0.22
+  }, gWater);
+
+  // water reflections
+  el("ellipse", { cx: 195, cy: 350, rx: 165, ry: 22, fill: "#d49b5d", opacity: 0.055, filter: "url(#tBlur)" }, gWater);
+  el("ellipse", { cx: 150, cy: 362, rx: 90, ry: 12, fill: "#5daaa0", opacity: 0.05, filter: "url(#tBlur)" }, gWater);
+  const reflections = [
+    [75, 354, 20, 3, "#e7b46d", 0.22],
+    [130, 370, 30, 4, "#6da9a3", 0.15],
+    [220, 357, 18, 3, "#e7b46d", 0.17],
+    [278, 371, 26, 4, "#7ea99a", 0.13],
+    [335, 352, 22, 3, "#e7b46d", 0.13]
+  ];
+  for (const [x, y, rx, ry, fill, opacity] of reflections) {
+    el("ellipse", { cx: x, cy: y, rx, ry, fill, opacity, filter: "url(#tSoft)" }, gWater);
+  }
+
+  // water lines
+  el("path", { d: "M18 346 C 56 343 81 347 110 345", fill: "none", stroke: "#9fc7bd", "stroke-width": 0.7, opacity: 0.16 }, gWater);
+  el("path", { d: "M148 360 C 177 357 199 361 226 358", fill: "none", stroke: "#9fc7bd", "stroke-width": 0.6, opacity: 0.13 }, gWater);
+  el("path", { d: "M260 380 C 296 376 323 380 352 377", fill: "none", stroke: "#9fc7bd", "stroke-width": 0.6, opacity: 0.11 }, gWater);
+
+  // boat
+  const boatGlow = el("circle", { cx: 296, cy: 356, r: 28, fill: "url(#tFireGlow)", opacity: 0.7 }, gWater);
+  el("path", { d: "M263 362 C 271 371 309 373 323 361 C 310 368 275 368 263 362Z", fill: "#3f332a" }, gWater);
+  el("path", { d: "M271 362 L315 362", stroke: "#8b7355", "stroke-width": 1.2, opacity: 0.7 }, gWater);
+  el("path", { d: "M295 361 L295 345", stroke: "#5f4a37", "stroke-width": 1.5 }, gWater);
+  el("path", { d: "M296 345 L306 351 L296 354Z", fill: "#b48055", opacity: 0.8 }, gWater);
+  el("circle", { cx: 296, cy: 355, r: 2.3, fill: "#ffd18b" }, gWater);
+  el("path", { d: "M294 353 L298 353 L297 358 L295 358Z", fill: "#6c503a" }, gWater);
+  el("path", { d: "M296 357 C 292 363 300 363 296 357", fill: "none", stroke: "#e6b16d", "stroke-width": 0.7, opacity: 0.5 }, gWater);
+
+  // foreground reeds
+  el("g", { stroke: "#243e32", "stroke-width": 1.4, fill: "none", opacity: 0.9 }, gWater);
+  const reeds = gWater.lastChild;
+  for (const [x, y, h] of [[8, 381, 22], [17, 387, 17], [26, 380, 26], [354, 385, 20], [364, 380, 25], [378, 387, 17]]) {
+    el("path", { d: `M${x} ${y} C ${x - 2} ${y - h * 0.55} ${x + 3} ${y - h * 0.8} ${x + 1} ${y - h}` }, reeds);
+    el("ellipse", { cx: x + 1, cy: y - h, rx: 1.8, ry: 4, fill: "#3d5540", stroke: "none" }, reeds);
+  }
+
+  // tiny near-shore stones
+  for (let i = 0; i < 7; i++) {
+    const x = 20 + i * 51 + (i % 3) * 9;
+    el("ellipse", { cx: x, cy: 391 + (i % 2) * 3, rx: 5 + (i % 3), ry: 2.2, fill: "#28352d", opacity: 0.8 }, gWater);
+  }
+
+  // clock tower glow
+  const tower = buildings.find(b => b.clock);
+  if (tower) {
+    const [gx, gy] = P(tower.x + tower.w * 0.5, tower.y + tower.d * 0.5, tower.h + 0.2);
+    el("circle", { cx: gx, cy: gy, r: 30, fill: "url(#tLampGlow)", opacity: 0.12 }, gTown);
+  }
+
+  // flying birds
+  el("path", { d: "M184 83 C 188 79 191 81 193 84 C 195 81 199 79 202 83", fill: "none", stroke: "#9baea6", "stroke-width": 0.8, opacity: 0.24 }, gFront);
+  el("path", { d: "M211 70 C 214 67 216 68 218 71 C 220 68 223 67 225 70", fill: "none", stroke: "#9baea6", "stroke-width": 0.7, opacity: 0.18 }, gFront);
+})();
+</script>
+</body>
+</html>
