@@ -1,0 +1,191 @@
+:root {
+  --strip-w: 960px;
+  --strip-h: 200px;
+  --ink: rgba(235, 246, 239, 0.92);
+  --muted: rgba(213, 231, 221, 0.56);
+  --faint: rgba(213, 231, 221, 0.34);
+  --lime: #d8ff63;
+  --line: rgba(218, 255, 239, 0.14);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  width: 1000px;
+  height: 240px;
+  overflow: hidden;
+  background: transparent;
+}
+
+body {
+  color: var(--ink);
+  font-family: "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+.journey-shell {
+  width: 1000px;
+  height: 240px;
+  padding: 20px;
+  pointer-events: none;
+}
+
+.journey-strip {
+  position: relative;
+  width: var(--strip-w);
+  height: var(--strip-h);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: #091317;
+  box-shadow: none;
+}
+
+#world {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: var(--strip-w);
+  height: var(--strip-h);
+}
+
+.journey-hud {
+  position: absolute;
+  z-index: 3;
+  left: 18px;
+  right: 18px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  pointer-events: none;
+}
+
+.journey-hud.top {
+  top: 15px;
+  align-items: flex-start;
+  padding-bottom: 20px;
+  background: linear-gradient(to bottom, rgba(4, 10, 10, 0.46), transparent);
+}
+
+.leg-block { display: flex; flex-direction: column; gap: 5px; }
+
+.kicker {
+  color: var(--faint);
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.10em;
+}
+
+.leg-block b {
+  color: var(--ink);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
+}
+
+.trip-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--muted);
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+}
+
+.distance { color: var(--ink); font-size: 14px; }
+.weather { display: flex; align-items: center; gap: 6px; }
+.weather::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--lime);
+  opacity: 0.85;
+}
+
+.journey-hud.bottom {
+  bottom: 14px;
+  align-items: flex-end;
+  padding-top: 28px;
+  background: linear-gradient(to top, rgba(4, 10, 10, 0.68), transparent);
+}
+
+.travel-status {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+#status { color: var(--ink); }
+#todayDistance { color: var(--faint); font-family: "Cascadia Code", "Consolas", monospace; font-size: 10.5px; }
+
+.route {
+  flex: 0 0 270px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+}
+
+#nextLeg {
+  color: var(--muted);
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+}
+
+.route-bar {
+  width: 100%;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(224, 244, 234, 0.13);
+}
+
+.route-bar i {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--lime);
+  box-shadow: 0 0 10px rgba(216, 255, 99, 0.45);
+  transition: width 300ms ease;
+}
+
+.camp-badge {
+  position: absolute;
+  z-index: 4;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 10px 6px;
+  border: 1px solid rgba(240, 201, 139, 0.22);
+  border-radius: 999px;
+  color: #e6c891;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  background: rgba(24, 20, 13, 0.48);
+}
+
+.postcard-dot {
+  position: absolute;
+  z-index: 4;
+  right: 20px;
+  top: 85px;
+  width: 5px;
+  height: 5px;
+  border: 1px solid rgba(255, 231, 188, 0.8);
+  border-radius: 50%;
+  background: #f0c98b;
+  box-shadow: 0 0 12px rgba(240, 201, 139, 0.6);
+}
+
+.journey-strip.is-paused { filter: saturate(0.62) brightness(0.8); }

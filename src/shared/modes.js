@@ -17,7 +17,7 @@ const MODES = [
     name: "桌边远行",
     english: "Deskbound",
     tagline: "你工作，他赶路；你停下，他扎营。",
-    status: "soon",
+    status: "ready",
     screen: "底部旅行风景带",
     input: "路程与遭遇",
     ritual: "看一张风景明信片，选一件纪念品",

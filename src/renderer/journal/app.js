@@ -32,6 +32,13 @@
   const captureText = $("#captureText");
   const captureFallback = $("#captureFallback");
   const modeList = $("#modeList");
+  const journeyModeTag = $("#journeyModeTag");
+  const journeyToday = $("#journeyToday");
+  const journeyTotal = $("#journeyTotal");
+  const journeySouvenirs = $("#journeySouvenirs");
+  const journeyLeg = $("#journeyLeg");
+  const journeyPostcard = $("#journeyPostcard");
+  const journeySwitch = $("#journeySwitch");
   const pauseToggle = $("#pauseToggle");
   const overlayToggle = $("#overlayToggle");
   const loginToggle = $("#loginToggle");
@@ -46,6 +53,7 @@
   };
 
   let current = null;
+  let currentJourneyMode = "garden";
   let toastTimer = null;
 
   function pad(value) {
@@ -67,6 +75,10 @@
 
   function formatMinutes(ms) {
     return Math.max(0, Math.round((Number(ms) || 0) / 60000));
+  }
+
+  function formatKm(meters) {
+    return (Math.max(0, Number(meters) || 0) / 1000).toFixed(1);
   }
 
   function formatDateShort(key) {
@@ -264,19 +276,41 @@
       .join("") + (plants.length > shown.length ? `<span class="gchip">+${plants.length - shown.length}</span>` : "");
   }
 
+  function renderJourney(data) {
+    const journey = data.journey || {};
+    const mode = data.mode || "garden";
+    currentJourneyMode = mode;
+    const leg = journey.leg || {};
+    const postcard = journey.latestPostcard;
+    journeyModeTag.textContent = mode === "journey"
+      ? "正在远行"
+      : (journey.totalDistanceM > 0 ? "可切换" : "待出发");
+    journeyToday.textContent = formatKm(journey.todayDistanceM);
+    journeyTotal.textContent = formatKm(journey.totalDistanceM);
+    journeySouvenirs.textContent = formatNumber((journey.souvenirs || []).length);
+    journeyLeg.textContent = `${leg.name || "雾之谷"} → ${leg.next || "松针坡"}`;
+    journeyPostcard.textContent = postcard
+      ? `${postcard.title} · ${postcard.line}${postcard.souvenir ? ` · 拾到 ${postcard.souvenir}` : ""}`
+      : "还没有旅行明信片。开始工作，他就会出发。";
+    journeySwitch.textContent = mode === "journey" ? "回到键息花园" : "进入桌边远行";
+  }
+
   function renderModes(data) {
     const modes = Array.isArray(data.modes) ? data.modes : [];
+    const currentMode = data.mode || "garden";
     modeList.innerHTML = modes
       .map((mode) => {
-        const active = mode.status === "ready";
+        const active = mode.id === currentMode;
+        const available = mode.status === "ready";
+        const className = active ? "active" : available ? "ready" : "soon";
         return `
-          <button class="mode-card ${active ? "active" : "soon"}" data-mode="${escapeHtml(mode.id)}" type="button">
+          <button class="mode-card ${className}" data-mode="${escapeHtml(mode.id)}" type="button">
             <span class="mode-index">${escapeHtml(mode.index)}</span>
             <span class="mode-copy">
               <span class="mode-name">${escapeHtml(mode.name)} <small>${escapeHtml(mode.english)}</small></span>
               <span class="mode-tagline">${escapeHtml(mode.tagline)}</span>
             </span>
-            <span class="mode-state">${active ? "当前" : "SOON"}</span>
+            <span class="mode-state">${active ? "当前" : available ? "可切换" : "SOON"}</span>
           </button>
         `;
       })
@@ -304,6 +338,7 @@
     renderWeek(data);
     renderToday(data);
     renderGardenSummary(data);
+    renderJourney(data);
     renderModes(data);
     renderSettings(data);
   }
@@ -344,6 +379,16 @@
     });
     loginToggle.addEventListener("change", async () => {
       await callApi(api?.setLaunchAtLogin(loginToggle.checked));
+    });
+
+    journeySwitch.addEventListener("click", async () => {
+      const target = currentJourneyMode === "journey" ? "garden" : "journey";
+      const result = await callApi(api?.setMode(target));
+      if (result && result.ok === false) {
+        showToast(result.reason || "这个模式还在路上。");
+      } else if (!api) {
+        showToast("这是预览模式，打开桌面应用后可以切换。");
+      }
     });
 
     modeList.addEventListener("click", async (event) => {
@@ -418,6 +463,7 @@
       period: "夜里",
       daysTogether: 12,
       firstRun: false,
+      mode: "garden",
       paused: false,
       settings: { paused: false, overlayVisible: true, launchAtLogin: false },
       hasNewPostcard: true,
@@ -442,7 +488,7 @@
       history,
       modes: [
         { id: "garden", index: "A", name: "键息花园", english: "Between Keys", tagline: "你工作，它下雨。你停下，它入夜。", status: "ready" },
-        { id: "journey", index: "B", name: "桌边远行", english: "Deskbound", tagline: "你工作，他赶路；你停下，他扎营。", status: "soon" },
+        { id: "journey", index: "B", name: "桌边远行", english: "Deskbound", tagline: "你工作，他赶路；你停下，他扎营。", status: "ready" },
         { id: "town", index: "C", name: "键盘小镇", english: "Key Town", tagline: "每一下敲击，亮一盏灯。", status: "soon" },
       ],
       plants: [
@@ -455,6 +501,17 @@
         { type: "moss", species: "月苔", growth: 0.88, slot: 6 },
       ],
       garden: { archived: 2 },
+      journey: {
+        totalDistanceM: 9420,
+        todayDistanceM: 2520,
+        souvenirs: ["旧车票", "松果"],
+        leg: { name: "旧车站", next: "风蚀原", progress: 0.57 },
+        latestPostcard: {
+          title: "松针坡",
+          line: "松针落在肩上，路比想象中更软。",
+          souvenir: "松果",
+        },
+      },
       runtime: { capture: { running: true, healthy: true, error: null }, autoPaused: false },
     };
   }

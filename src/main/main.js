@@ -91,6 +91,7 @@ function runtimeStatus() {
     paused: Boolean(engine?.getState().settings.paused),
     overlayVisible: Boolean(engine?.getState().settings.overlayVisible),
     launchAtLogin: Boolean(engine?.getState().settings.launchAtLogin),
+    mode: engine?.getState().profile.mode || "garden",
     hotkeys: { ...hotkeyStatus },
     dataDir: store?.getDataDir() || "",
     version: app.getVersion(),
@@ -100,8 +101,11 @@ function runtimeStatus() {
 }
 
 function overlayPayload() {
+  const mode = engine.getState().profile.mode;
+  const state = mode === "journey" ? engine.journeySnapshot(Date.now()) : engine.snapshot(Date.now());
   return {
-    ...engine.snapshot(Date.now()),
+    ...state,
+    mode,
     runtime: runtimeStatus(),
   };
 }
@@ -141,20 +145,35 @@ function scheduleSave() {
   if (store && engine) store.scheduleSave(engine.getState(), 5000);
 }
 
+function overlayMode() {
+  return engine?.getState().profile.mode === "journey" ? "journey" : "garden";
+}
+
+function overlayRendererFile() {
+  return overlayMode() === "journey" ? rendererFile("journey", "index.html") : rendererFile("overlay", "index.html");
+}
+
+function overlaySize() {
+  return overlayMode() === "journey" ? { width: 1000, height: 240 } : { width: 260, height: 320 };
+}
+
 function positionOverlay() {
   if (!overlayWindow || overlayWindow.isDestroyed()) return;
   const display = screen.getPrimaryDisplay();
-  const width = 260;
-  const height = 320;
-  const x = Math.round(display.workArea.x + display.workArea.width - width - 16);
+  const { width, height } = overlaySize();
+  const safeWidth = Math.min(width, Math.max(320, display.workArea.width - 24));
+  const x = overlayMode() === "journey"
+    ? Math.round(display.workArea.x + (display.workArea.width - safeWidth) / 2)
+    : Math.round(display.workArea.x + display.workArea.width - safeWidth - 16);
   const y = Math.round(display.workArea.y + display.workArea.height - height - 16);
-  overlayWindow.setBounds({ x, y, width, height });
+  overlayWindow.setBounds({ x, y, width: safeWidth, height });
 }
 
 function createOverlayWindow() {
+  const { width, height } = overlaySize();
   overlayWindow = new BrowserWindow({
-    width: 260,
-    height: 320,
+    width,
+    height,
     show: false,
     transparent: true,
     backgroundColor: "#00000000",
@@ -186,12 +205,19 @@ function createOverlayWindow() {
   overlayWindow.on("closed", () => {
     overlayWindow = null;
   });
-  overlayWindow.loadFile(rendererFile("overlay", "index.html"));
+  overlayWindow.loadFile(overlayRendererFile());
   positionOverlay();
 
   overlayWindow.once("ready-to-show", () => {
     if (engine.getState().settings.overlayVisible) overlayWindow.showInactive();
   });
+}
+
+function refreshOverlayMode() {
+  if (!overlayWindow || overlayWindow.isDestroyed()) return;
+  positionOverlay();
+  overlayWindow.loadFile(overlayRendererFile());
+  if (engine.getState().settings.overlayVisible) overlayWindow.showInactive();
 }
 
 function createJournalWindow() {
@@ -424,14 +450,15 @@ function bindIpc() {
     return shell.openPath(privacyPath);
   });
   ipcMain.handle("app:set-mode", (_event, mode) => {
-    if (mode === "garden") {
-      return { ok: true, mode: "garden" };
+    if (mode !== "garden" && mode !== "journey") {
+      const candidate = MODES.find((item) => item.id === mode);
+      return { ok: false, reason: candidate ? `${candidate.name}正在路上` : "未知模式" };
     }
-    const candidate = MODES.find((item) => item.id === mode);
-    return {
-      ok: false,
-      reason: candidate ? `${candidate.name}正在路上` : "未知模式",
-    };
+    engine.setMode(mode);
+    scheduleSave();
+    refreshOverlayMode();
+    broadcast();
+    return { ok: true, mode };
   });
   ipcMain.handle("app:minimize-journal", () => {
     journalWindow?.minimize();
@@ -495,6 +522,9 @@ function startEngine() {
   }
 
   const desiredState = engine.getState();
+  if (process.env.KEYGARDEN_MODE === "journey" || process.env.KEYGARDEN_MODE === "garden") {
+    engine.setMode(process.env.KEYGARDEN_MODE);
+  }
   if (desiredState.settings.launchAtLogin) {
     try {
       app.setLoginItemSettings({

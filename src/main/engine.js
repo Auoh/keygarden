@@ -14,6 +14,7 @@ const {
   weatherFor,
 } = require("../shared/rhythm");
 const { MODES } = require("../shared/modes");
+const { JourneyEngine } = require("./journey");
 
 const STATE_VERSION = 2;
 const MAX_PLANTS = 9;
@@ -98,7 +99,7 @@ function normalizeState(input, now = Date.now()) {
   state.today.longestBurst = Math.max(0, Number(state.today.longestBurst) || 0);
   state.meta.totalKeys = Math.max(0, Number(state.meta.totalKeys) || 0);
   state.meta.activeDays = Math.max(0, Number(state.meta.activeDays) || 0);
-  state.profile.mode = "garden";
+  state.profile.mode = state.profile.mode === "journey" ? "journey" : "garden";
 
   return state;
 }
@@ -109,6 +110,8 @@ class GameEngine {
     this.state = normalizeState(state, this.now());
     this.recentKeys = [];
     this.lastInput = null;
+    this.journey = new JourneyEngine({ state: this.state.journey, now: this.now });
+    this.syncJourney();
     this.ensureToday(this.now());
   }
 
@@ -128,18 +131,38 @@ class GameEngine {
     this.state.settings.launchAtLogin = Boolean(enabled);
   }
 
+  setMode(mode) {
+    if (mode !== "garden" && mode !== "journey") return false;
+    this.state.profile.mode = mode;
+    return true;
+  }
+
+  syncJourney() {
+    this.state.journey = this.journey.getState();
+  }
+
+  journeySnapshot(timestamp = this.now()) {
+    this.syncJourney();
+    return this.journey.snapshot(timestamp);
+  }
+
   completeFirstRun() {
     this.state.meta.firstRun = false;
   }
 
   markPostcardSeen() {
     const latest = this.latestHistory();
+    let seen = false;
     if (latest?.postcard) {
       latest.postcard.unseen = false;
       this.state.lastPostcardDate = latest.date;
-      return true;
+      seen = true;
     }
-    return false;
+    if (this.journey) {
+      seen = this.journey.markPostcardSeen() || seen;
+      this.syncJourney();
+    }
+    return seen;
   }
 
   latestHistory() {
@@ -279,6 +302,10 @@ class GameEngine {
 
     this.recentKeys.push(timestamp);
     if (this.recentKeys.length > 180) this.recentKeys.splice(0, this.recentKeys.length - 180);
+
+    this.journey.recordKey(category, timestamp);
+    this.syncJourney();
+
     return day;
   }
 
@@ -324,6 +351,7 @@ class GameEngine {
 
     return {
       now: timestamp,
+      mode: this.state.profile.mode,
       clock: `${String(new Date(timestamp).getHours()).padStart(2, "0")}:${String(new Date(timestamp).getMinutes()).padStart(2, "0")}`,
       period: timeOfDay(new Date(timestamp)),
       hour,
@@ -371,6 +399,8 @@ class GameEngine {
 
     return {
       ...snapshot,
+      mode: this.state.profile.mode,
+      journey: this.journey.dashboard(timestamp),
       history,
       modes: MODES,
       settings: { ...this.state.settings },

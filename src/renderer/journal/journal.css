@@ -591,8 +591,9 @@ button { cursor: pointer; }
 }
 
 .today-panel { order: 0; }
-.settings-panel { order: 1; }
-.modes-panel { order: 2; }
+.journey-panel { order: 1; }
+.settings-panel { order: 2; }
+.modes-panel { order: 3; }
 
 .panel-head {
   display: flex;
@@ -712,6 +713,79 @@ button { cursor: pointer; }
 
 .capture-fallback { margin-left: auto; color: #929b8d; font-size: 10px; }
 
+/* ---------- journey / mode B ---------- */
+
+.journey-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.journey-stats div {
+  padding: 9px 10px;
+  border: 1px solid #e4e8de;
+  border-radius: 11px;
+  background: #f7f8f3;
+}
+
+.journey-stats span {
+  display: block;
+  color: #828b7d;
+  font-size: 11px;
+}
+
+.journey-stats b {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--ink);
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.journey-stats small {
+  margin-left: 2px;
+  color: #939c8e;
+  font-size: 10px;
+}
+
+.journey-leg {
+  margin: 12px 0 0;
+  color: #596353;
+  font-size: 13px;
+}
+
+.journey-postcard {
+  margin: 7px 0 0;
+  color: #838d7d;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.journey-switch {
+  width: 100%;
+  margin-top: 13px;
+  padding: 10px 12px;
+  border: 1px solid var(--ink);
+  border-radius: 10px;
+  background: var(--ink);
+  color: #f6f8f1;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.journey-switch::after {
+  content: "↗";
+  float: right;
+  color: var(--lime);
+  font-weight: 400;
+}
+
+.journey-switch:hover { background: #20291f; }
+
 /* ---------- modes ---------- */
 
 .mode-list { display: flex; flex-direction: column; gap: 7px; margin-top: 13px; }
@@ -736,6 +810,7 @@ button { cursor: pointer; }
 }
 
 .mode-card.soon { opacity: 0.62; }
+.mode-card.ready { opacity: 1; }
 .mode-card.soon:hover { opacity: 0.82; }
 
 .mode-index {

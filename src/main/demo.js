@@ -102,6 +102,52 @@ function buildDemoState(now = Date.now()) {
   state.history = older;
   state.lastPostcardDate = latestPostcard.date;
   state.today = today;
+
+  const journeyToday = emptyDay(dateKey(todayDate));
+  journeyToday.keys = 1140;
+  journeyToday.distanceM = 2520;
+  journeyToday.bursts = 9;
+  journeyToday.activeMs = 1900000;
+  journeyToday.pauses = 2;
+  journeyToday.categories = { ...journeyToday.categories, letter: 860, digit: 80, punct: 130, space: 60, enter: 10 };
+  journeyToday.hourly[9] = 120;
+  journeyToday.hourly[10] = 260;
+  journeyToday.hourly[11] = 160;
+  journeyToday.hourly[15] = 180;
+  journeyToday.hourly[21] = 420;
+  journeyToday.lastKeyAt = now - 12000;
+  journeyToday.firstKeyAt = now - 6 * 3600000;
+  const journeyPostcard = {
+    date: dateKey(dateAt(-1, now)),
+    title: "雾之谷",
+    rhythm: "night",
+    rhythmLabel: "夜间细雨",
+    description: "灯亮得晚，雨声很轻。",
+    line: "雾从谷底升起来，远处的灯像一枚旧邮票。",
+    unseen: true,
+    souvenir: "旧车票",
+    stats: { keys: 980, distanceM: 2160, activeMs: 1800000, pauses: 2, bursts: 7 },
+  };
+  state.journey = {
+    version: 1,
+    createdAt: dateAt(-11, now).toISOString(),
+    totalKeys: 13400,
+    totalDistanceM: 8520,
+    todayDistanceM: journeyToday.distanceM,
+    souvenirs: ["旧车票"],
+    history: [{
+      date: journeyPostcard.date,
+      distanceM: 2160,
+      keys: 980,
+      activeMs: 1800000,
+      rhythm: "night",
+      rhythmLabel: "夜间细雨",
+      postcard: journeyPostcard,
+      souvenir: "旧车票",
+    }],
+    lastPostcardDate: journeyPostcard.date,
+    today: journeyToday,
+  };
   return state;
 }
 

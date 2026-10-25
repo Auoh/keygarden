@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>键息花园 · 桌边远行</title>
+  <link rel="stylesheet" href="journey.css">
+</head>
+<body>
+  <div class="journey-shell">
+    <section class="journey-strip" id="strip" aria-label="桌边远行：一条随工作推进的旅行风景带">
+      <canvas id="world" aria-hidden="true"></canvas>
+
+      <header class="journey-hud top">
+        <div class="leg-block">
+          <span class="kicker" id="tripKicker">DESKBOUND / TRIP 012</span>
+          <b id="legName">雾之谷</b>
+        </div>
+        <div class="trip-meta">
+          <span class="distance" id="distance">0.0 km</span>
+          <span class="weather" id="weather">晴</span>
+        </div>
+      </header>
+
+      <div class="camp-badge" id="campBadge" hidden>扎营</div>
+      <div class="postcard-dot" id="postcardDot" hidden title="有一张旅行明信片"></div>
+
+      <footer class="journey-hud bottom">
+        <div class="travel-status">
+          <span id="status">正在赶路</span>
+          <span id="todayDistance">今天 0.0 km</span>
+        </div>
+        <div class="route">
+          <span id="nextLeg">下一站 松针坡</span>
+          <div class="route-bar"><i id="routeProgress"></i></div>
+        </div>
+      </footer>
+    </section>
+  </div>
+
+  <script src="journey-canvas.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
