@@ -1,0 +1,40 @@
+const MODES = [
+  {
+    id: "garden",
+    index: "A",
+    name: "键息花园",
+    english: "Between Keys",
+    tagline: "你工作，它下雨。你停下，它入夜。",
+    status: "ready",
+    screen: "右下角生态瓶",
+    input: "天气与生长",
+    ritual: "看一张明信片，浇一次水",
+    mood: "陪伴 · 治愈",
+  },
+  {
+    id: "journey",
+    index: "B",
+    name: "桌边远行",
+    english: "Deskbound",
+    tagline: "你工作，他赶路；你停下，他扎营。",
+    status: "soon",
+    screen: "底部旅行风景带",
+    input: "路程与遭遇",
+    ritual: "看一张风景明信片，选一件纪念品",
+    mood: "探索 · 叙事",
+  },
+  {
+    id: "town",
+    index: "C",
+    name: "键盘小镇",
+    english: "Key Town",
+    tagline: "每一下敲击，亮一盏灯。",
+    status: "soon",
+    screen: "右侧小镇面板",
+    input: "灯火与建筑",
+    ritual: "看小镇变化，批一张明日蓝图",
+    mood: "经营 · 成长",
+  },
+];
+
+module.exports = { MODES };

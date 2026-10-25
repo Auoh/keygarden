@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>键息花园 · 手帐</title>
+  <link rel="stylesheet" href="journal.css">
+</head>
+<body>
+  <div class="app">
+    <header class="titlebar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 34 34" fill="none">
+            <path d="M17 28c0-8 2-13 9-17 1 8-1 14-9 17Z" fill="#9ac8a2" opacity=".9"/>
+            <path d="M17 28C10 23 8 16 10 9c7 3 9 9 7 19Z" fill="#6fa37a" opacity=".72"/>
+            <path d="M17 29V13" stroke="#d8e7cc" stroke-width="1.1" stroke-linecap="round" opacity=".7"/>
+            <circle cx="17" cy="8" r="1.6" fill="#efc989"/>
+          </svg>
+        </span>
+        <div class="brand-copy">
+          <div class="brand-name">键息花园</div>
+          <div class="brand-en">BETWEEN KEYS</div>
+        </div>
+      </div>
+      <div class="status-pill" id="statusPill">
+        <i></i>
+        <span id="statusText">正在连接</span>
+      </div>
+      <div class="window-controls">
+        <button class="win-btn" id="minimizeBtn" aria-label="最小化">
+          <svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg>
+        </button>
+        <button class="win-btn close" id="closeBtn" aria-label="隐藏到手帐">
+          <svg viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="left">
+        <div class="welcome" id="welcome" hidden>
+          <div class="welcome-eyebrow">FIRST EVENING</div>
+          <h2>你好，我是你的桌面花园。</h2>
+          <p>你正常工作时，我会在屏幕角落慢慢长。不用专门输入什么，也不用照看我。等到合适的时候，我会把今天的样子写成一张明信片。</p>
+          <div class="welcome-actions">
+            <button class="btn warm" id="startBtn">把它放到角落</button>
+            <button class="btn ghost" id="welcomePrivacyBtn">先看看隐私说明</button>
+          </div>
+        </div>
+
+        <div class="section-head">
+          <div>
+            <div class="kicker">LATEST POSTCARD</div>
+            <h1 id="postcardHeading">最近一张明信片</h1>
+          </div>
+          <div class="head-date" id="todayDate">—</div>
+        </div>
+
+        <article class="postcard" id="postcard">
+          <div class="postcard-inner">
+            <div class="pc-top">
+              <span>TODAY'S GARDEN</span>
+              <span id="pcDay">DAY 001</span>
+            </div>
+            <div class="pc-stamp" aria-hidden="true">
+              <svg viewBox="0 0 62 72" fill="none">
+                <rect x="3" y="3" width="56" height="66" rx="2" stroke="currentColor" stroke-dasharray="2 3" opacity=".42"/>
+                <path d="M31 58C31 43 34 31 46 19c2 15-2 28-15 39Z" fill="currentColor" opacity=".25"/>
+                <path d="M31 58C20 49 17 36 21 24c10 6 13 18 10 34Z" fill="currentColor" opacity=".18"/>
+                <path d="M31 59V30" stroke="currentColor" stroke-width="1" opacity=".45"/>
+                <circle cx="31" cy="19" r="2" fill="currentColor" opacity=".4"/>
+              </svg>
+            </div>
+            <h2 class="pc-title" id="pcTitle">第一张明信片</h2>
+            <p class="pc-subtitle" id="pcSubtitle">雨还没有下，花园先替你等着。</p>
+            <div class="pc-rule"></div>
+            <p class="pc-line" id="pcLine">等你结束今天的工作，我会把花园的样子放在这里。</p>
+            <div class="pc-meta">
+              <div>
+                <span>雨量</span>
+                <b id="pcKeys">0</b>
+              </div>
+              <div>
+                <span>一起亮着</span>
+                <b id="pcActive">0 分钟</b>
+              </div>
+              <div>
+                <span>停顿</span>
+                <b id="pcPauses">0</b>
+              </div>
+            </div>
+            <div class="pc-bottom">
+              <span id="pcPlant">还没有新的种子</span>
+              <span id="pcDate">—</span>
+            </div>
+            <div class="pressed-flower" aria-hidden="true">
+              <svg viewBox="0 0 120 90" fill="none">
+                <path d="M8 82C38 72 55 49 66 12" stroke="currentColor" stroke-width=".8" opacity=".25"/>
+                <path d="M52 38C34 31 31 43 46 48c-2-9 3-12 6-10Z" fill="currentColor" opacity=".15"/>
+                <path d="M64 20c-10-7-3-16 4-8 3-9 13-4 7 3 9 0 9 11 0 10 3 8-7 13-10 4-8 4-14-4-7-9Z" fill="currentColor" opacity=".18"/>
+                <circle cx="69" cy="22" r="3" fill="currentColor" opacity=".2"/>
+              </svg>
+            </div>
+          </div>
+        </article>
+
+        <section class="garden-summary">
+          <div class="gs-copy">
+            <div class="kicker">IN THE CORNER</div>
+            <h3>现在，角落里长这样</h3>
+            <p id="gardenSummaryText">还没有植物，第一颗种子在等今天的工作。</p>
+          </div>
+          <div class="gs-plants" id="gardenChips"></div>
+        </section>
+
+        <section class="quiet-note">
+          <div class="quiet-mark" aria-hidden="true">—</div>
+          <p>花园不催你。今天多长一片叶子，明天少长一片，都没有关系。</p>
+          <span>IT GROWS WITHOUT BEING WATCHED</span>
+        </section>
+
+        <section class="week-section" id="weekSection">
+          <div class="week-head">
+            <div>
+              <div class="kicker">A WEEK OF WEATHER</div>
+              <h3>这一周下过的雨</h3>
+            </div>
+            <span class="week-note">只记节奏，不记内容</span>
+          </div>
+          <div class="week-strip" id="weekStrip"></div>
+        </section>
+      </section>
+
+      <aside class="right">
+        <section class="panel today-panel">
+          <div class="panel-head">
+            <div>
+              <div class="kicker">RIGHT NOW</div>
+              <h3>今天的花园</h3>
+            </div>
+            <div class="weather-pill" id="weatherPill">微雨</div>
+          </div>
+          <p class="rhythm-line" id="rhythmLine">雨还没开始。</p>
+          <div class="stat-grid">
+            <div class="stat">
+              <span>雨量</span>
+              <b id="todayKeys">0</b>
+              <small>次节拍</small>
+            </div>
+            <div class="stat">
+              <span>一起亮着</span>
+              <b id="todayActive">0</b>
+              <small>分钟</small>
+            </div>
+            <div class="stat">
+              <span>停顿</span>
+              <b id="todayPauses">0</b>
+              <small>次休息</small>
+            </div>
+            <div class="stat">
+              <span>阵风</span>
+              <b id="todayBursts">0</b>
+              <small>段节奏</small>
+            </div>
+          </div>
+          <div class="garden-line">
+            <div class="plant-dots" id="plantDots" aria-hidden="true"></div>
+            <span id="gardenMeta">3 株植物 · 第 1 天</span>
+          </div>
+          <div class="capture-row">
+            <span class="capture-dot" id="captureDot"></span>
+            <span id="captureText">观察器准备中</span>
+            <span class="capture-fallback" id="captureFallback"></span>
+          </div>
+        </section>
+
+        <section class="panel modes-panel">
+          <div class="panel-head">
+            <div>
+              <div class="kicker">THREE WAYS TO PLAY</div>
+              <h3>游戏模式</h3>
+            </div>
+            <span class="tiny-note">A 已开放</span>
+          </div>
+          <div class="mode-list" id="modeList"></div>
+        </section>
+
+        <section class="panel settings-panel">
+          <div class="panel-head">
+            <div>
+              <div class="kicker">QUIET SETTINGS</div>
+              <h3>让它安静地待着</h3>
+            </div>
+          </div>
+          <label class="setting-row">
+            <span>
+              <b>暂停记录</b>
+              <small>暂停时观察器会被完全关闭</small>
+            </span>
+            <input type="checkbox" id="pauseToggle" class="switch-input">
+            <i class="switch" aria-hidden="true"></i>
+          </label>
+          <label class="setting-row">
+            <span>
+              <b>角落花园</b>
+              <small>透明、置顶、鼠标穿透</small>
+            </span>
+            <input type="checkbox" id="overlayToggle" class="switch-input">
+            <i class="switch" aria-hidden="true"></i>
+          </label>
+          <label class="setting-row">
+            <span>
+              <b>开机启动</b>
+              <small>登录后安静地开始</small>
+            </span>
+            <input type="checkbox" id="loginToggle" class="switch-input">
+            <i class="switch" aria-hidden="true"></i>
+          </label>
+          <div class="setting-actions">
+            <button class="link-btn" id="dataBtn">数据目录</button>
+            <button class="link-btn" id="privacyBtn">隐私说明</button>
+            <button class="link-btn danger" id="quitBtn">退出</button>
+          </div>
+          <p class="privacy-note">只记录按键节奏与键类计数。不保存字符、窗口标题或剪贴板，也不联网。</p>
+        </section>
+      </aside>
+    </main>
+
+    <div class="toast" id="toast" hidden></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>键息花园</title>
+  <link rel="stylesheet" href="overlay.css">
+</head>
+<body>
+  <div class="overlay-shell">
+    <div class="garden-card" id="gardenCard">
+      <canvas id="garden" aria-label="一只能随打字节奏生长的桌面生态瓶"></canvas>
+
+      <header class="topbar">
+        <div class="clock">
+          <span class="live-dot" id="liveDot"></span>
+          <span id="clock">18:42</span>
+        </div>
+        <div class="weather" id="weather">
+          <span class="weather-icon" id="weatherIcon" aria-hidden="true"></span>
+          <span id="weatherLabel">微雨</span>
+        </div>
+      </header>
+
+      <div class="notice-dot" id="postcardDot" hidden title="有一张新的明信片"></div>
+
+      <div class="pause-layer" id="pauseLayer" hidden>
+        <div class="pause-badge">花园暂歇</div>
+        <p id="pauseHint">Ctrl+Alt+空格 继续</p>
+      </div>
+
+      <footer class="bottombar">
+        <div class="day-label" id="dayLabel">第 1 天 · 傍晚</div>
+        <div class="hint" id="hint">继续工作，别管我</div>
+      </footer>
+
+      <div class="sheen" aria-hidden="true"></div>
+      <div class="vignette" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <script src="garden-canvas.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
