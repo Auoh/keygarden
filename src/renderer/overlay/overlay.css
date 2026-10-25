@@ -56,16 +56,16 @@ body {
 .topbar {
   position: absolute;
   z-index: 4;
-  top: 13px;
-  left: 14px;
-  right: 14px;
+  top: 16px;
+  left: 16px;
+  right: 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   color: var(--muted);
   font-family: "Cascadia Code", Consolas, "SFMono-Regular", monospace;
-  font-size: 10px;
-  letter-spacing: 0.04em;
+  font-size: 11px;
+  letter-spacing: 0.03em;
   text-shadow: 0 1px 7px rgba(0, 0, 0, 0.45);
 }
 
@@ -88,16 +88,16 @@ body {
   color: var(--muted);
 }
 
-.weather-icon {
-  position: relative;
-  display: block;
-  width: 8px;
-  height: 10px;
-  border: 1px solid currentColor;
-  border-radius: 6px 6px 7px 7px;
-  transform: rotate(8deg);
-  opacity: 0.8;
+.weather::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.85;
 }
+
+.weather-icon { display: none; }
 
 .weather-icon::after {
   content: "";
@@ -189,9 +189,9 @@ body {
 .bottombar {
   position: absolute;
   z-index: 4;
-  left: 14px;
-  right: 14px;
-  bottom: 12px;
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -199,8 +199,8 @@ body {
   padding-top: 22px;
   color: var(--muted);
   font-family: "Cascadia Code", Consolas, monospace;
-  font-size: 9px;
-  letter-spacing: 0.03em;
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
   background: linear-gradient(to top, rgba(4, 10, 7, 0.62), transparent);
   text-shadow: 0 1px 7px rgba(0, 0, 0, 0.42);
 }
@@ -210,8 +210,8 @@ body {
 .hint {
   color: var(--muted);
   font-family: "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.015em;
+  font-size: 12px;
+  letter-spacing: 0.01em;
   text-align: right;
   line-height: 1.35;
 }

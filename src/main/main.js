@@ -208,7 +208,7 @@ function createJournalWindow() {
     resizable: true,
     maximizable: false,
     fullscreenable: false,
-    backgroundColor: "#080d12",
+    backgroundColor: "#f3f5ef",
     icon: readIcon(0),
     title: "键息花园",
     webPreferences: {

@@ -71,17 +71,17 @@
     postcardDot.hidden = !state.hasNewPostcard || paused;
 
     if (paused) {
-      hint.textContent = isAutoPaused ? "屏幕休息，花园也休息" : "花园在等你";
+      hint.textContent = isAutoPaused ? "屏幕休息" : "花园在等你";
     } else if (captureError || !captureRunning) {
-      hint.textContent = "观察器未连接，打开手帐看看";
+      hint.textContent = "观察器未连接";
     } else if (state.firstRun) {
-      hint.textContent = "先开始工作吧，我会慢慢长";
+      hint.textContent = "开始工作吧";
     } else if (state.hasNewPostcard) {
-      hint.textContent = "今晚有一张明信片";
+      hint.textContent = "今晚有明信片";
     } else if ((state.idleMs || 0) > 10 * 60 * 1000) {
       hint.textContent = "你休息，我也休息";
     } else {
-      hint.textContent = "继续工作，别管我";
+      hint.textContent = "继续工作";
     }
   }
 
