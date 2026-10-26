@@ -143,3 +143,13 @@ test("overlay positions are stored per mode and can be reset", () => {
   assert.deepEqual(engine.getState().settings.overlayPositions, {});
   assert.equal(engine.setOverlayPosition("town", { x: 1, y: 2 }), false);
 });
+
+test("overlay theme accepts only light and dark", () => {
+  const now = at(2026, 10, 25, 9);
+  const engine = new GameEngine({ state: createDefaultState(now), now: () => now });
+  assert.equal(engine.getState().settings.overlayTheme, "light");
+  assert.equal(engine.setOverlayTheme("dark"), true);
+  assert.equal(engine.getState().settings.overlayTheme, "dark");
+  assert.equal(engine.setOverlayTheme("sepia"), false);
+  assert.equal(engine.getState().settings.overlayTheme, "dark");
+});

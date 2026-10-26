@@ -44,6 +44,7 @@ function createDefaultState(now = Date.now()) {
       paused: false,
       overlayVisible: true,
       launchAtLogin: false,
+      overlayTheme: "light",
       overlayPositions: {},
     },
     profile: { mode: "garden" },
@@ -94,6 +95,7 @@ function normalizeState(input, now = Date.now()) {
   state.settings.overlayPositions = state.settings.overlayPositions && typeof state.settings.overlayPositions === "object"
     ? state.settings.overlayPositions
     : {};
+  state.settings.overlayTheme = state.settings.overlayTheme === "dark" ? "dark" : "light";
   state.today.hourly = Array.from({ length: 24 }, (_, hour) => Number(state.today.hourly?.[hour]) || 0);
   state.today.keys = Math.max(0, Number(state.today.keys) || 0);
   state.today.activeMs = Math.max(0, Number(state.today.activeMs) || 0);
@@ -143,6 +145,12 @@ class GameEngine {
 
   resetOverlayPositions() {
     this.state.settings.overlayPositions = {};
+  }
+
+  setOverlayTheme(theme) {
+    if (theme !== "light" && theme !== "dark") return false;
+    this.state.settings.overlayTheme = theme;
+    return true;
   }
 
   setLaunchAtLogin(enabled) {

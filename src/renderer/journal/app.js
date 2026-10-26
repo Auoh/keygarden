@@ -41,6 +41,7 @@
   const journeySwitch = $("#journeySwitch");
   const pauseToggle = $("#pauseToggle");
   const overlayToggle = $("#overlayToggle");
+  const themeChoice = $("#themeChoice");
   const loginToggle = $("#loginToggle");
   const toast = $("#toast");
 
@@ -322,6 +323,10 @@
     pauseToggle.checked = Boolean(settings.paused);
     overlayToggle.checked = Boolean(settings.overlayVisible);
     loginToggle.checked = Boolean(settings.launchAtLogin);
+    const theme = settings.overlayTheme === "dark" ? "dark" : "light";
+    themeChoice.querySelectorAll("button").forEach((button) => {
+      button.classList.toggle("active", button.dataset.theme === theme);
+    });
   }
 
   function renderWelcome(data) {
@@ -382,6 +387,12 @@
     });
     loginToggle.addEventListener("change", async () => {
       await callApi(api?.setLaunchAtLogin(loginToggle.checked));
+    });
+
+    themeChoice.addEventListener("click", async (event) => {
+      const button = event.target.closest("button[data-theme]");
+      if (!button) return;
+      await callApi(api?.setOverlayTheme(button.dataset.theme));
     });
 
     journeySwitch.addEventListener("click", async () => {
@@ -468,7 +479,7 @@
       firstRun: false,
       mode: "garden",
       paused: false,
-      settings: { paused: false, overlayVisible: true, launchAtLogin: false },
+      settings: { paused: false, overlayVisible: true, launchAtLogin: false, overlayTheme: "light" },
       hasNewPostcard: true,
       weather: { key: "rain", label: "微雨" },
       rhythmPreview: { key: "night", label: "夜间细雨", description: "灯亮得晚，雨声很轻。" },

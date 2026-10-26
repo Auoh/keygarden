@@ -64,6 +64,9 @@
     let dpr = 1;
     let images = null;
     let theme = "light";
+    let sets = {};
+    const requestedTheme = new URLSearchParams(window.location.search).get("theme");
+    let preferredTheme = requestedTheme === "dark" ? "dark" : "light";
     let started = false;
     let frame = 0;
     let start = 0;
@@ -269,32 +272,40 @@
     startLoop();
 
     (async () => {
+      const custom = {};
+      const fallback = {};
       for (const candidate of THEMES) {
-        const loaded = await loadSet(candidate);
-        if (loaded) {
-          images = loaded;
-          theme = candidate;
-          break;
-        }
+        custom[candidate] = await loadSet(candidate);
+        if (!custom[candidate]) fallback[candidate] = await loadSet(`placeholder/${candidate}`);
+        sets[candidate] = custom[candidate] || fallback[candidate] || null;
       }
-      if (!images) {
-        for (const candidate of THEMES) {
-          const loaded = await loadSet(`placeholder/${candidate}`);
-          if (loaded) {
-            images = loaded;
-            theme = candidate;
-            break;
-          }
-        }
+
+      const preferredCustom = custom[preferredTheme] ? preferredTheme : null;
+      const otherCustom = THEMES.find((candidate) => candidate !== preferredTheme && custom[candidate]);
+      const preferredAny = sets[preferredTheme] ? preferredTheme : null;
+      const otherAny = THEMES.find((candidate) => candidate !== preferredTheme && sets[candidate]);
+      const chosen = preferredCustom || otherCustom || preferredAny || otherAny;
+      if (chosen) {
+        theme = chosen;
+        images = sets[chosen];
+        if (onTheme) onTheme(theme);
       }
-      if (onTheme) onTheme(theme);
     })();
+
+    function applyTheme(candidate) {
+      if (!candidate || !sets[candidate] || candidate === theme) return;
+      theme = candidate;
+      images = sets[candidate];
+      if (onTheme) onTheme(theme);
+    }
 
     return {
       setState(next) {
         if (!next) return;
         const input = next.lastInput;
+        if (next.overlayTheme) preferredTheme = next.overlayTheme;
         state = { ...state, ...next };
+        if (next.overlayTheme) applyTheme(next.overlayTheme);
         if (input && input.at && input.at !== lastInputAt) {
           lastInputAt = input.at;
           if (!state.paused && !state.runtime?.autoPaused) triggerPulse(input);

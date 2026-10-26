@@ -966,6 +966,33 @@ button { cursor: pointer; }
   outline-offset: 2px;
 }
 
+.theme-row { align-items: center; }
+
+.theme-choice {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid #dfe4d8;
+  border-radius: 999px;
+  background: #f2f5ed;
+}
+
+.theme-choice button {
+  min-width: 46px;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #778272;
+  font-size: 11px;
+}
+
+.theme-choice button.active {
+  background: var(--ink);
+  color: var(--lime);
+}
+
 .setting-actions {
   display: flex;
   flex-wrap: wrap;

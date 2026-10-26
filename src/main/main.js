@@ -113,6 +113,7 @@ function overlayPayload() {
   return {
     ...state,
     mode,
+    overlayTheme: engine.getState().settings.overlayTheme || "light",
     runtime: runtimeStatus(),
   };
 }
@@ -507,6 +508,14 @@ function setLaunchAtLogin(enabled) {
   sendJournalState();
 }
 
+function setOverlayThemeSetting(theme) {
+  if (!engine.setOverlayTheme(theme)) return false;
+  scheduleSave();
+  broadcast();
+  updateTray();
+  return true;
+}
+
 function toggleOverlay() {
   setOverlayVisible(!engine.getState().settings.overlayVisible);
 }
@@ -541,6 +550,23 @@ function buildTrayMenu() {
         positionOverlay();
         scheduleSave();
       },
+    },
+    {
+      label: "界面主题",
+      submenu: [
+        {
+          label: "浅色 · 晨光",
+          type: "radio",
+          checked: engine?.getState().settings.overlayTheme !== "dark",
+          click: () => setOverlayThemeSetting("light"),
+        },
+        {
+          label: "深色 · 苔夜",
+          type: "radio",
+          checked: engine?.getState().settings.overlayTheme === "dark",
+          click: () => setOverlayThemeSetting("dark"),
+        },
+      ],
     },
     {
       label: paused ? "继续记录" : "暂停记录",
@@ -657,6 +683,15 @@ function bindIpc() {
     positionOverlay();
     scheduleSave();
     return { ok: true };
+  });
+  ipcMain.handle("app:set-overlay-theme", (_event, theme) => {
+    const ok = engine.setOverlayTheme(theme);
+    if (ok) {
+      scheduleSave();
+      broadcast();
+      updateTray();
+    }
+    return { ok };
   });
   ipcMain.handle("app:set-mode", (_event, mode) => {
     if (mode !== "garden" && mode !== "journey") {
