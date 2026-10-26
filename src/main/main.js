@@ -331,7 +331,10 @@ function createOverlayWindow() {
   startOverlayHitTest();
 
   overlayWindow.once("ready-to-show", () => {
-    if (engine.getState().settings.overlayVisible) overlayWindow.showInactive();
+    if (engine.getState().settings.overlayVisible) {
+      overlayWindow.showInactive();
+      overlayWindow.moveTop();
+    }
   });
 }
 
@@ -343,6 +346,7 @@ function refreshOverlayMode() {
   overlayWindow.loadFile(overlayRendererFile());
   if (engine.getState().settings.overlayVisible) {
     overlayWindow.showInactive();
+    overlayWindow.moveTop();
     startOverlayHitTest();
   }
 }
@@ -461,6 +465,7 @@ function setOverlayVisible(visible, { save = true } = {}) {
   if (overlayWindow && !overlayWindow.isDestroyed()) {
     if (visible) {
       overlayWindow.showInactive();
+      overlayWindow.moveTop();
       updateOverlayHitTest();
     } else {
       setOverlayInteractive(false);
