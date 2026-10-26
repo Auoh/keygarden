@@ -41,6 +41,8 @@ body {
   border-radius: 22px;
   background: #091317;
   box-shadow: none;
+  pointer-events: auto;
+  cursor: grab;
 }
 
 #world {
@@ -201,6 +203,11 @@ body.is-moving .journey-strip * {
 body.is-moving .journey-strip {
   cursor: grab;
   outline: 1px dashed rgba(201, 239, 85, 0.85);
+  outline-offset: 2px;
+}
+
+body.is-hovering .journey-strip {
+  outline: 1px solid rgba(201, 239, 85, 0.42);
   outline-offset: 2px;
 }
 

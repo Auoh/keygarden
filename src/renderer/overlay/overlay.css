@@ -43,6 +43,8 @@ body {
   background: #0a120d;
   box-shadow: none;
   color: var(--ink);
+  pointer-events: auto;
+  cursor: grab;
 }
 
 #garden {
@@ -313,6 +315,11 @@ body.is-moving .garden-card * {
 body.is-moving .garden-card {
   cursor: grab;
   outline: 1px dashed rgba(201, 239, 85, 0.85);
+  outline-offset: 2px;
+}
+
+body.is-hovering .garden-card {
+  outline: 1px solid rgba(201, 239, 85, 0.42);
   outline-offset: 2px;
 }
 

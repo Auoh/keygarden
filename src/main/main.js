@@ -47,6 +47,11 @@ let hotkeyStatus = {};
 let captureTimer = null;
 let overlayMoveMode = false;
 let overlayMoveTimer = null;
+let overlayInteractive = false;
+let overlayHitTestTimer = null;
+let overlayDragTimer = null;
+let overlayDragSafety = null;
+let overlayDragOffset = { x: 0, y: 0 };
 
 const gotLock = process.env.KEYGARDEN_CAPTURE === "1" ? true : app.requestSingleInstanceLock();
 if (!gotLock) {
@@ -198,6 +203,87 @@ function positionOverlay() {
   overlayWindow.setBounds(bounds);
 }
 
+function overlayCardRect() {
+  if (!overlayWindow || overlayWindow.isDestroyed()) return null;
+  const bounds = overlayWindow.getBounds();
+  const card = overlayMode() === "journey"
+    ? { x: 20, y: 20, width: 960, height: 200 }
+    : { x: 20, y: 20, width: 220, height: 280 };
+  return {
+    x: bounds.x + card.x,
+    y: bounds.y + card.y,
+    width: card.width,
+    height: card.height,
+  };
+}
+
+function setOverlayInteractive(interactive) {
+  if (!overlayWindow || overlayWindow.isDestroyed()) return;
+  if (overlayInteractive === interactive) return;
+  overlayInteractive = interactive;
+  if (interactive) {
+    overlayWindow.setIgnoreMouseEvents(false);
+    overlayWindow.setFocusable(true);
+  } else {
+    if (overlayWindow.isFocused()) overlayWindow.blur();
+    overlayWindow.setIgnoreMouseEvents(true, { forward: true });
+    overlayWindow.setFocusable(false);
+  }
+  if (!overlayWindow.webContents.isDestroyed()) {
+    overlayWindow.webContents.send("overlay:hover", interactive);
+  }
+}
+
+function updateOverlayHitTest() {
+  if (!overlayWindow || overlayWindow.isDestroyed()) return;
+  if (overlayMoveMode) {
+    setOverlayInteractive(true);
+    return;
+  }
+  if (!engine?.getState().settings.overlayVisible || !overlayWindow.isVisible()) {
+    setOverlayInteractive(false);
+    return;
+  }
+  const rect = overlayCardRect();
+  if (!rect) return;
+  const point = screen.getCursorScreenPoint();
+  const inside = point.x >= rect.x && point.x <= rect.x + rect.width
+    && point.y >= rect.y && point.y <= rect.y + rect.height;
+  setOverlayInteractive(inside);
+}
+
+function startOverlayHitTest() {
+  if (overlayHitTestTimer) clearInterval(overlayHitTestTimer);
+  overlayHitTestTimer = setInterval(updateOverlayHitTest, 50);
+  overlayHitTestTimer.unref?.();
+  updateOverlayHitTest();
+}
+
+function startOverlayDrag() {
+  if (!overlayWindow || overlayWindow.isDestroyed() || overlayMoveMode) return;
+  if (overlayDragTimer) return;
+  const cursor = screen.getCursorScreenPoint();
+  const [windowX, windowY] = overlayWindow.getPosition();
+  overlayDragOffset = { x: cursor.x - windowX, y: cursor.y - windowY };
+  setOverlayInteractive(true);
+  overlayDragTimer = setInterval(() => {
+    if (!overlayWindow || overlayWindow.isDestroyed()) return;
+    const point = screen.getCursorScreenPoint();
+    overlayWindow.setPosition(Math.round(point.x - overlayDragOffset.x), Math.round(point.y - overlayDragOffset.y));
+  }, 16);
+  overlayDragSafety = setTimeout(endOverlayDrag, 30000);
+}
+
+function endOverlayDrag() {
+  if (!overlayDragTimer) return;
+  clearInterval(overlayDragTimer);
+  overlayDragTimer = null;
+  if (overlayDragSafety) clearTimeout(overlayDragSafety);
+  overlayDragSafety = null;
+  saveOverlayPosition();
+  updateOverlayHitTest();
+}
+
 function createOverlayWindow() {
   const { width, height } = overlaySize();
   overlayWindow = new BrowserWindow({
@@ -238,10 +324,11 @@ function createOverlayWindow() {
     overlayWindow = null;
   });
   overlayWindow.on("move", () => {
-    if (overlayMoveMode) saveOverlayPosition();
+    if (overlayMoveMode || overlayInteractive) saveOverlayPosition();
   });
   overlayWindow.loadFile(overlayRendererFile());
   positionOverlay();
+  startOverlayHitTest();
 
   overlayWindow.once("ready-to-show", () => {
     if (engine.getState().settings.overlayVisible) overlayWindow.showInactive();
@@ -250,10 +337,14 @@ function createOverlayWindow() {
 
 function refreshOverlayMode() {
   if (!overlayWindow || overlayWindow.isDestroyed()) return;
+  endOverlayDrag();
   if (overlayMoveMode) setMoveMode(false);
   positionOverlay();
   overlayWindow.loadFile(overlayRendererFile());
-  if (engine.getState().settings.overlayVisible) overlayWindow.showInactive();
+  if (engine.getState().settings.overlayVisible) {
+    overlayWindow.showInactive();
+    startOverlayHitTest();
+  }
 }
 
 function saveOverlayPosition() {
@@ -266,6 +357,7 @@ function saveOverlayPosition() {
 function setMoveMode(enabled) {
   if (!overlayWindow || overlayWindow.isDestroyed()) return;
   if (enabled) {
+    endOverlayDrag();
     if (overlayMoveMode) {
       if (overlayMoveTimer) clearTimeout(overlayMoveTimer);
       overlayMoveTimer = setTimeout(() => setMoveMode(false), 20000);
@@ -274,9 +366,8 @@ function setMoveMode(enabled) {
     if (!engine.getState().settings.overlayVisible) setOverlayVisible(true);
     overlayMoveMode = true;
     overlayWindow.setAlwaysOnTop(true, "floating");
-    overlayWindow.setFocusable(true);
     overlayWindow.setMovable(true);
-    overlayWindow.setIgnoreMouseEvents(false);
+    setOverlayInteractive(true);
     overlayWindow.show();
     overlayWindow.focus();
     overlayWindow.webContents.send("overlay:move-mode", true);
@@ -293,9 +384,9 @@ function setMoveMode(enabled) {
   saveOverlayPosition();
   overlayWindow.webContents.send("overlay:move-mode", false);
   overlayWindow.setMovable(false);
-  overlayWindow.setFocusable(false);
-  overlayWindow.setIgnoreMouseEvents(true, { forward: true });
   overlayWindow.setAlwaysOnTop(false);
+  setOverlayInteractive(false);
+  updateOverlayHitTest();
   updateTray();
   log("overlay move mode off");
 }
@@ -362,11 +453,19 @@ function hideJournal() {
 }
 
 function setOverlayVisible(visible, { save = true } = {}) {
-  if (!visible && overlayMoveMode) setMoveMode(false);
+  if (!visible) {
+    endOverlayDrag();
+    if (overlayMoveMode) setMoveMode(false);
+  }
   engine.setOverlayVisible(visible);
   if (overlayWindow && !overlayWindow.isDestroyed()) {
-    if (visible) overlayWindow.showInactive();
-    else overlayWindow.hide();
+    if (visible) {
+      overlayWindow.showInactive();
+      updateOverlayHitTest();
+    } else {
+      setOverlayInteractive(false);
+      overlayWindow.hide();
+    }
   }
   if (save) scheduleSave();
   updateTray();
@@ -577,6 +676,8 @@ function bindIpc() {
   });
   ipcMain.on("overlay:ready", () => sendOverlayState());
   ipcMain.on("overlay:move-end", () => setMoveMode(false));
+  ipcMain.on("overlay:drag-start", () => startOverlayDrag());
+  ipcMain.on("overlay:drag-end", () => endOverlayDrag());
 }
 
 function setupPowerEvents() {
@@ -721,6 +822,10 @@ app.on("before-quit", () => {
   if (broadcastTimer) clearInterval(broadcastTimer);
   if (fastBroadcastTimer) clearTimeout(fastBroadcastTimer);
   if (captureTimer) clearTimeout(captureTimer);
+  if (overlayMoveTimer) clearTimeout(overlayMoveTimer);
+  if (overlayHitTestTimer) clearInterval(overlayHitTestTimer);
+  if (overlayDragTimer) clearInterval(overlayDragTimer);
+  if (overlayDragSafety) clearTimeout(overlayDragSafety);
   observer?.stop();
   if (store && engine) store.flush(engine.getState());
 });

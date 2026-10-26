@@ -13,5 +13,12 @@ contextBridge.exposeInMainWorld("keygardenOverlay", {
     ipcRenderer.on("overlay:move-mode", listener);
     return () => ipcRenderer.removeListener("overlay:move-mode", listener);
   },
+  onHover: (callback) => {
+    const listener = (_event, hovering) => callback(Boolean(hovering));
+    ipcRenderer.on("overlay:hover", listener);
+    return () => ipcRenderer.removeListener("overlay:hover", listener);
+  },
+  startDrag: () => ipcRenderer.send("overlay:drag-start"),
+  endDrag: () => ipcRenderer.send("overlay:drag-end"),
   endMoveMode: () => ipcRenderer.send("overlay:move-end"),
 });

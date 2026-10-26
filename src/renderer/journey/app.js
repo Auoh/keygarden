@@ -73,6 +73,9 @@
     bridge.onMoveMode?.((moving) => {
       document.body.classList.toggle("is-moving", moving);
     });
+    bridge.onHover?.((hovering) => {
+      document.body.classList.toggle("is-hovering", hovering);
+    });
     bridge
       .getState()
       .then((state) => {
@@ -95,6 +98,24 @@
       });
     }, 2400);
   }
+
+  document.addEventListener("mousedown", () => {
+    if (!document.body.classList.contains("is-moving")) window.focus();
+  });
+
+  function endDrag(event) {
+    if (strip.hasPointerCapture?.(event.pointerId)) strip.releasePointerCapture(event.pointerId);
+    bridge?.endDrag?.();
+  }
+
+  strip.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || document.body.classList.contains("is-moving")) return;
+    event.preventDefault();
+    strip.setPointerCapture?.(event.pointerId);
+    bridge?.startDrag?.();
+  });
+  strip.addEventListener("pointerup", endDrag);
+  strip.addEventListener("pointercancel", endDrag);
 
   document.addEventListener("keydown", (event) => {
     if (!document.body.classList.contains("is-moving")) return;
