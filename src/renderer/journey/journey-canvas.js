@@ -245,14 +245,18 @@
 
   function drawTraveler(ctx, state, time, assets) {
     const camped = Boolean(state.camped) || Boolean(state.runtime?.autoPaused) || Boolean(state.runtime?.paused);
+    const progress = clamp(state.leg?.progress || 0, 0, 1);
+    // Walk the character across the strip as the leg advances, instead of
+    // pinning them to one spot for the whole journey.
+    const travelX = 236 + progress * 488;
     if (camped && assets?.camp) {
       const image = assets.camp;
       const height = 58;
       const width = image.width / image.height * height;
-      const x = 672 - width / 2;
+      const x = travelX - width / 2;
       const y = 176 - height;
       ctx.save();
-      ctx.translate(672, 175);
+      ctx.translate(travelX, 175);
       ctx.scale(1, 0.12);
       const shadow = ctx.createRadialGradient(0, 0, 6, 0, 0, 92);
       shadow.addColorStop(0, "rgba(2, 7, 8, 0.55)");
@@ -273,13 +277,17 @@
       const image = assets.traveler;
       const height = 54;
       const width = image.width / image.height * height;
-      const bob = Math.sin(time * 4.2) * 1.2;
-      const x = 610 - width / 2;
-      const y = 176 - height + bob;
-      ctx.drawImage(image, x, y, width, height);
+      const stride = Math.sin(time * 4.2);
+      const bob = stride * 1.2;
+      const lean = stride * 0.012;
+      ctx.save();
+      ctx.translate(travelX, 176 + bob);
+      ctx.rotate(lean);
+      ctx.drawImage(image, -width / 2, -height, width, height);
+      ctx.restore();
       return;
     }
-    const x = 610;
+    const x = travelX;
     const y = 176;
     if (camped) {
       // Tent

@@ -43,3 +43,4 @@ the original silhouette traveler / code-drawn tent is used.
 
 - Index: [`docs/journey-image-prompts.md`](../../../../docs/journey-image-prompts.md)
 - Per-image: [`docs/journey-prompts/`](../../../../docs/journey-prompts/)
+- Traveler states (walk-b / camp-sit / rest / arrive / rain): [`docs/journey-character-prompts.md`](../../../../docs/journey-character-prompts.md)

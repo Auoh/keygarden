@@ -188,6 +188,14 @@ background, landscape, ground, shadow, text, letters, logo, watermark, UI, borde
 
 > 单图文件：[journey-prompts/08-camp.md](journey-prompts/08-camp.md)
 
+## 人物状态扩展
+
+现有 `walk.png` 之外，推荐补 **walk-b（步态第二帧）**、**camp-sit（营地坐姿）** 和 **rest（短休息）**；`arrive` / `rain` 可选。完整提示词、风格连贯约束和放图路径见：
+
+- [journey-character-prompts.md](journey-character-prompts.md)
+
+这些状态图都沿用同一套黑色剪影 + 暖琥珀轮廓光，不要重新设计角色。
+
 
 ## 负面提示词说明
 
