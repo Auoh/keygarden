@@ -148,10 +148,10 @@
     const dawn = hour >= 6 && hour < 9;
     ctx.save();
     ctx.fillStyle = night
-      ? "rgba(3, 12, 18, 0.25)"
+      ? "rgba(3, 12, 18, 0.10)"
       : dawn
-        ? "rgba(255, 210, 160, 0.05)"
-        : "rgba(20, 32, 28, 0.04)";
+        ? "rgba(255, 210, 160, 0.02)"
+        : "rgba(20, 32, 28, 0.00)";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     ctx.restore();
     return true;
@@ -247,11 +247,26 @@
     const camped = Boolean(state.camped) || Boolean(state.runtime?.autoPaused) || Boolean(state.runtime?.paused);
     if (camped && assets?.camp) {
       const image = assets.camp;
-      const height = 68;
+      const height = 58;
       const width = image.width / image.height * height;
       const x = 672 - width / 2;
-      const y = 166 - height;
+      const y = 176 - height;
+      ctx.save();
+      ctx.translate(672, 175);
+      ctx.scale(1, 0.12);
+      const shadow = ctx.createRadialGradient(0, 0, 6, 0, 0, 92);
+      shadow.addColorStop(0, "rgba(2, 7, 8, 0.55)");
+      shadow.addColorStop(0.65, "rgba(2, 7, 8, 0.22)");
+      shadow.addColorStop(1, "rgba(2, 7, 8, 0)");
+      ctx.fillStyle = shadow;
+      ctx.beginPath();
+      ctx.arc(0, 0, 92, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      ctx.save();
+      ctx.globalAlpha = 0.96;
       ctx.drawImage(image, x, y, width, height);
+      ctx.restore();
       return;
     }
     if (!camped && assets?.traveler) {
@@ -260,12 +275,12 @@
       const width = image.width / image.height * height;
       const bob = Math.sin(time * 4.2) * 1.2;
       const x = 610 - width / 2;
-      const y = 166 - height + bob;
+      const y = 176 - height + bob;
       ctx.drawImage(image, x, y, width, height);
       return;
     }
     const x = 610;
-    const y = 166;
+    const y = 176;
     if (camped) {
       // Tent
       ctx.fillStyle = "#0a1715";
@@ -450,10 +465,10 @@
 
     (async () => {
       for (let index = 0; index < LEG_FILES.length; index += 1) {
-        backgrounds[index] = await loadStage(`assets/journey/backgrounds/${LEG_FILES[index]}`);
+        backgrounds[index] = await loadStage(`assets/backgrounds/${LEG_FILES[index]}`);
       }
-      assets.traveler = await loadStage("assets/journey/traveler/walk");
-      assets.camp = await loadStage("assets/journey/props/camp");
+      assets.traveler = await loadStage("assets/traveler/walk");
+      assets.camp = await loadStage("assets/props/camp");
     })();
 
     return {

@@ -6,8 +6,10 @@ incrementally.
 
 ## Backgrounds
 
-Six ultra-wide plates, one per route leg. The strip is `960×200`, so export at
-**1920×400** (or any 24:5 image) with the horizon and path in the central band.
+Six ultra-wide plates, one per route leg. The strip is `960×200`, so the
+prepared plates here are **1584×330** (exactly 24:5). The original cinematic
+2.35:1 source is kept in [`docs/journey-source/`](../../../../docs/journey-source/)
+and can be re-cropped with `scripts/prepare-journey-assets.py`.
 
 ```
 backgrounds/
@@ -26,16 +28,16 @@ backgrounds/
 
 The renderer crossfades to the next plate near the end of a leg.
 
-## Optional props
+## Props
 
 ```
-traveler/walk.png    # side-view walking traveler, transparent, 256×256+
-props/camp.png       # tent + campfire, side view, transparent, 512×256+
+traveler/walk.png    # walking traveler cutout, 369×655
+props/camp.png       # tent + campfire cutout, 1028×495
 ```
 
-If these are missing, the original silhouette traveler / code-drawn tent is
-used. Transparent PNG is preferred. If your generator cannot output alpha, use
-a flat chroma-key background and remove it before saving.
+The supplied `walk.jpg` / `camp.jpg` were chroma/white-background images, so
+the PNGs here are cutouts with their backgrounds removed. If they are missing,
+the original silhouette traveler / code-drawn tent is used.
 
 ## Prompt pack
 

@@ -28,7 +28,7 @@
 - 手帐里的 **Mode B / DESKBOUND** 面板显示今日路程、总路程、纪念品和最近一张旅行明信片
 - 手帐面板上的按钮可以直接在 A / B 之间切换
 - 原来的“游戏模式”卡片里，B 已从 `SOON` 改为 `可切换`
-- 美术素材可替换：6 张背景 + 透明旅人 + 营地；提示词见 [journey-image-prompts.md](journey-image-prompts.md)，放置路径见 [assets/README.md](../src/renderer/journey/assets/README.md)
+- 已接入 6 张 24:5 风景背景（原图 2.35:1，按场景焦点裁切）、旅人 `walk.png` 和营地 `camp.png` 透明贴图；提示词见 [journey-image-prompts.md](journey-image-prompts.md)，放置路径见 [assets/README.md](../src/renderer/journey/assets/README.md)
 
 ## 代码
 
@@ -43,6 +43,6 @@
 - B 的独立旅行手帐/明信片全屏页
 - 纪念品三选一（现在按路段自动拾取）
 - 更完整的地标、遭遇和路线分支
-- 正式美术资产已留好替换位：6 张背景 + 旅人 + 营地；当前先用代码风景 fallback
+- 背景/旅人/营地已经接入；后续替换时保持同名文件即可
 
 这些不影响现在先跑通“工作 → 赶路 → 扎营 → 日切明信片”的主循环。
