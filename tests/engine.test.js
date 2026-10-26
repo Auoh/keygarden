@@ -153,3 +153,13 @@ test("overlay theme accepts only light and dark", () => {
   assert.equal(engine.setOverlayTheme("sepia"), false);
   assert.equal(engine.getState().settings.overlayTheme, "dark");
 });
+
+test("always-on-top is an opt-in setting", () => {
+  const now = at(2026, 10, 25, 9);
+  const engine = new GameEngine({ state: createDefaultState(now), now: () => now });
+  assert.equal(engine.getState().settings.alwaysOnTop, false);
+  engine.setAlwaysOnTop(true);
+  assert.equal(engine.getState().settings.alwaysOnTop, true);
+  engine.setAlwaysOnTop(false);
+  assert.equal(engine.getState().settings.alwaysOnTop, false);
+});

@@ -27,6 +27,32 @@
     a: 0.12 + ((index * 7) % 10) / 100,
   }));
 
+  const LEG_FILES = [
+    "00-mist-valley",
+    "01-pine-slope",
+    "02-old-station",
+    "03-wind-plain",
+    "04-star-lake",
+    "05-north-shore",
+  ];
+
+  function loadImage(path) {
+    return new Promise((resolve) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => resolve(null);
+      image.src = path;
+    });
+  }
+
+  async function loadStage(path) {
+    for (const ext of ["jpg", "png", "webp"]) {
+      const image = await loadImage(`${path}.${ext}`);
+      if (image) return image;
+    }
+    return null;
+  }
+
   function rgba(hex, alpha) {
     const value = hex.replace("#", "");
     const n = parseInt(value, 16);
@@ -97,8 +123,41 @@
     ctx.globalAlpha = 1;
   }
 
-  function drawRidge(ctx, scroll, color, baseY, amplitude, frequency, phase) {
+  function drawCover(ctx, image) {
+    const scale = Math.max(WIDTH / image.width, HEIGHT / image.height);
+    const width = image.width * scale;
+    const height = image.height * scale;
+    ctx.drawImage(image, (WIDTH - width) / 2, (HEIGHT - height) / 2, width, height);
+  }
+
+  function drawBackground(ctx, state, backgrounds) {
+    const index = Number.isInteger(state.leg?.index) ? state.leg.index : 0;
+    const image = backgrounds[index % LEG_FILES.length];
+    if (!image) return false;
+    drawCover(ctx, image);
+    const next = backgrounds[(index + 1) % LEG_FILES.length];
+    const progress = clamp(state.leg?.progress || 0, 0, 1);
+    if (next && progress > 0.82) {
+      ctx.save();
+      ctx.globalAlpha = (progress - 0.82) / 0.18;
+      drawCover(ctx, next);
+      ctx.restore();
+    }
+    const hour = Number.isFinite(state.hour) ? state.hour : 21;
+    const night = hour >= 20 || hour < 6;
+    const dawn = hour >= 6 && hour < 9;
     ctx.save();
+    ctx.fillStyle = night
+      ? "rgba(3, 12, 18, 0.25)"
+      : dawn
+        ? "rgba(255, 210, 160, 0.05)"
+        : "rgba(20, 32, 28, 0.04)";
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    ctx.restore();
+    return true;
+  }
+
+  function drawRidge(ctx, scroll, color, baseY, amplitude, frequency, phase) {    ctx.save();
     ctx.translate(-((scroll * frequency) % 240), 0);
     ctx.fillStyle = color;
     ctx.beginPath();
@@ -184,8 +243,27 @@
     ctx.fill();
   }
 
-  function drawTraveler(ctx, state, time) {
+  function drawTraveler(ctx, state, time, assets) {
     const camped = Boolean(state.camped) || Boolean(state.runtime?.autoPaused) || Boolean(state.runtime?.paused);
+    if (camped && assets?.camp) {
+      const image = assets.camp;
+      const height = 68;
+      const width = image.width / image.height * height;
+      const x = 672 - width / 2;
+      const y = 166 - height;
+      ctx.drawImage(image, x, y, width, height);
+      return;
+    }
+    if (!camped && assets?.traveler) {
+      const image = assets.traveler;
+      const height = 54;
+      const width = image.width / image.height * height;
+      const bob = Math.sin(time * 4.2) * 1.2;
+      const x = 610 - width / 2;
+      const y = 166 - height + bob;
+      ctx.drawImage(image, x, y, width, height);
+      return;
+    }
     const x = 610;
     const y = 166;
     if (camped) {
@@ -320,6 +398,8 @@
     let frame = 0;
     let last = 0;
     let start = 0;
+    const backgrounds = [];
+    const assets = { traveler: null, camp: null };
 
     function resize() {
       dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -341,10 +421,13 @@
       last = timestamp;
       const time = (timestamp - start) / 1000;
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
-      drawSky(ctx, state, time);
-      drawLandscape(ctx, state, time);
+      const hasBackground = drawBackground(ctx, state, backgrounds);
+      if (!hasBackground) {
+        drawSky(ctx, state, time);
+        drawLandscape(ctx, state, time);
+      }
       drawWeather(ctx, state, delta);
-      drawTraveler(ctx, state, time);
+      drawTraveler(ctx, state, time, assets);
 
       if (state.runtime?.autoPaused || state.runtime?.paused || state.paused) {
         ctx.fillStyle = "rgba(3, 8, 7, 0.24)";
@@ -364,6 +447,14 @@
     resize();
     window.addEventListener("resize", resize);
     loop();
+
+    (async () => {
+      for (let index = 0; index < LEG_FILES.length; index += 1) {
+        backgrounds[index] = await loadStage(`assets/journey/backgrounds/${LEG_FILES[index]}`);
+      }
+      assets.traveler = await loadStage("assets/journey/traveler/walk");
+      assets.camp = await loadStage("assets/journey/props/camp");
+    })();
 
     return {
       setState(next) {

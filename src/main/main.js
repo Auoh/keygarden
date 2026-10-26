@@ -165,6 +165,11 @@ function overlaySize() {
   return overlayMode() === "journey" ? { width: 1000, height: 240 } : { width: 260, height: 320 };
 }
 
+function applyOverlayAlwaysOnTop() {
+  if (!overlayWindow || overlayWindow.isDestroyed() || !engine) return;
+  overlayWindow.setAlwaysOnTop(Boolean(engine.getState().settings.alwaysOnTop), "floating");
+}
+
 function clampOverlayBounds(bounds) {
   const display = screen.getDisplayNearestPoint({
     x: Math.round(bounds.x + bounds.width / 2),
@@ -335,6 +340,7 @@ function createOverlayWindow() {
     if (engine.getState().settings.overlayVisible) {
       overlayWindow.showInactive();
       overlayWindow.moveTop();
+      applyOverlayAlwaysOnTop();
     }
   });
 }
@@ -348,6 +354,7 @@ function refreshOverlayMode() {
   if (engine.getState().settings.overlayVisible) {
     overlayWindow.showInactive();
     overlayWindow.moveTop();
+    applyOverlayAlwaysOnTop();
     startOverlayHitTest();
   }
 }
@@ -389,7 +396,7 @@ function setMoveMode(enabled) {
   saveOverlayPosition();
   overlayWindow.webContents.send("overlay:move-mode", false);
   overlayWindow.setMovable(false);
-  overlayWindow.setAlwaysOnTop(false);
+  applyOverlayAlwaysOnTop();
   setOverlayInteractive(false);
   updateOverlayHitTest();
   updateTray();
@@ -467,6 +474,7 @@ function setOverlayVisible(visible, { save = true } = {}) {
     if (visible) {
       overlayWindow.showInactive();
       overlayWindow.moveTop();
+      applyOverlayAlwaysOnTop();
       updateOverlayHitTest();
     } else {
       setOverlayInteractive(false);
@@ -516,6 +524,15 @@ function setOverlayThemeSetting(theme) {
   return true;
 }
 
+function setAlwaysOnTopSetting(enabled) {
+  engine.setAlwaysOnTop(enabled);
+  applyOverlayAlwaysOnTop();
+  scheduleSave();
+  updateTray();
+  sendJournalState();
+  return true;
+}
+
 function toggleOverlay() {
   setOverlayVisible(!engine.getState().settings.overlayVisible);
 }
@@ -538,6 +555,12 @@ function buildTrayMenu() {
       type: "checkbox",
       checked: overlayVisible,
       click: () => setOverlayVisible(!overlayVisible),
+    },
+    {
+      label: "窗口置顶",
+      type: "checkbox",
+      checked: Boolean(engine?.getState().settings.alwaysOnTop),
+      click: () => setAlwaysOnTopSetting(!engine.getState().settings.alwaysOnTop),
     },
     {
       label: overlayMoveMode ? "锁定窗口" : "移动窗口（20 秒）",
@@ -692,6 +715,10 @@ function bindIpc() {
       updateTray();
     }
     return { ok };
+  });
+  ipcMain.handle("app:set-always-on-top", (_event, enabled) => {
+    setAlwaysOnTopSetting(Boolean(enabled));
+    return { ok: true, enabled: Boolean(engine.getState().settings.alwaysOnTop) };
   });
   ipcMain.handle("app:set-mode", (_event, mode) => {
     if (mode !== "garden" && mode !== "journey") {

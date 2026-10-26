@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld("keygarden", {
   openPrivacy: () => ipcRenderer.invoke("app:open-privacy"),
   setMode: (mode) => ipcRenderer.invoke("app:set-mode", mode),
   setOverlayTheme: (theme) => ipcRenderer.invoke("app:set-overlay-theme", theme),
+  setAlwaysOnTop: (enabled) => ipcRenderer.invoke("app:set-always-on-top", enabled),
   moveOverlay: () => ipcRenderer.invoke("app:move-overlay"),
   resetOverlayPosition: () => ipcRenderer.invoke("app:reset-overlay-position"),
   minimize: () => ipcRenderer.invoke("app:minimize-journal"),
