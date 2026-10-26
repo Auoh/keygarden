@@ -59,7 +59,9 @@ B 的实现说明：[Mode B · 桌边远行](docs/mode-b.md)
 
 ## 生长画面素材
 
-悬浮窗使用 5 张 2:3 的生态瓶照片做阶段交叉淡化，打字越久，花园越往后一阶段。当前仓库里是 Pexels 的占位图；替换成自己的图不需要改代码。
+悬浮窗使用 5 张 2:3 的生态瓶照片做阶段交叉淡化，打字越久，花园越往后一阶段。当前已接入一套**深色实拍图**（`dark/stage-0..4.jpg`）；浅色目录为空，渲染器会自动回退到深色。
+
+![深色生长画面](docs/screenshots/overlay-dark-real.png)
 
 - 放到：`src/renderer/overlay/assets/garden/light/stage-0.jpg` … `stage-4.jpg`（或 `dark/`）
 - 规格与提示词：[docs/garden-image-prompts.md](docs/garden-image-prompts.md)
