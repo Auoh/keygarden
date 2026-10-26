@@ -8,4 +8,10 @@ contextBridge.exposeInMainWorld("keygardenOverlay", {
     ipcRenderer.on("overlay:state", listener);
     return () => ipcRenderer.removeListener("overlay:state", listener);
   },
+  onMoveMode: (callback) => {
+    const listener = (_event, moving) => callback(Boolean(moving));
+    ipcRenderer.on("overlay:move-mode", listener);
+    return () => ipcRenderer.removeListener("overlay:move-mode", listener);
+  },
+  endMoveMode: () => ipcRenderer.send("overlay:move-end"),
 });

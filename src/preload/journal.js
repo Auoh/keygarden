@@ -15,6 +15,8 @@ contextBridge.exposeInMainWorld("keygarden", {
   openDataFolder: () => ipcRenderer.invoke("app:open-data-folder"),
   openPrivacy: () => ipcRenderer.invoke("app:open-privacy"),
   setMode: (mode) => ipcRenderer.invoke("app:set-mode", mode),
+  moveOverlay: () => ipcRenderer.invoke("app:move-overlay"),
+  resetOverlayPosition: () => ipcRenderer.invoke("app:reset-overlay-position"),
   minimize: () => ipcRenderer.invoke("app:minimize-journal"),
   hide: () => ipcRenderer.invoke("app:hide-journal"),
   quit: () => ipcRenderer.invoke("app:quit"),

@@ -129,3 +129,17 @@ test("state can be normalized from old or partial data", () => {
   assert.equal(engine.getState().today.categories.letter, 0);
   assert.equal(engine.getState().settings.paused, false);
 });
+
+test("overlay positions are stored per mode and can be reset", () => {
+  const now = at(2026, 10, 25, 9);
+  const engine = new GameEngine({ state: createDefaultState(now), now: () => now });
+  assert.equal(engine.setOverlayPosition("garden", { x: 100, y: 200 }), true);
+  assert.equal(engine.setOverlayPosition("journey", { x: 10, y: 20 }), true);
+  assert.deepEqual(engine.getState().settings.overlayPositions, {
+    garden: { x: 100, y: 200 },
+    journey: { x: 10, y: 20 },
+  });
+  engine.resetOverlayPositions();
+  assert.deepEqual(engine.getState().settings.overlayPositions, {});
+  assert.equal(engine.setOverlayPosition("town", { x: 1, y: 2 }), false);
+});

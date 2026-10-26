@@ -44,6 +44,7 @@ function createDefaultState(now = Date.now()) {
       paused: false,
       overlayVisible: true,
       launchAtLogin: false,
+      overlayPositions: {},
     },
     profile: { mode: "garden" },
     meta: {
@@ -90,6 +91,9 @@ function normalizeState(input, now = Date.now()) {
   }));
 
   state.today.categories = { ...defaults.today.categories, ...(state.today.categories || {}) };
+  state.settings.overlayPositions = state.settings.overlayPositions && typeof state.settings.overlayPositions === "object"
+    ? state.settings.overlayPositions
+    : {};
   state.today.hourly = Array.from({ length: 24 }, (_, hour) => Number(state.today.hourly?.[hour]) || 0);
   state.today.keys = Math.max(0, Number(state.today.keys) || 0);
   state.today.activeMs = Math.max(0, Number(state.today.activeMs) || 0);
@@ -125,6 +129,20 @@ class GameEngine {
 
   setOverlayVisible(visible) {
     this.state.settings.overlayVisible = Boolean(visible);
+  }
+
+  setOverlayPosition(mode, position) {
+    if (mode !== "garden" && mode !== "journey") return false;
+    if (!position || !Number.isFinite(position.x) || !Number.isFinite(position.y)) return false;
+    this.state.settings.overlayPositions = {
+      ...(this.state.settings.overlayPositions || {}),
+      [mode]: { x: Math.round(position.x), y: Math.round(position.y) },
+    };
+    return true;
+  }
+
+  resetOverlayPositions() {
+    this.state.settings.overlayPositions = {};
   }
 
   setLaunchAtLogin(enabled) {

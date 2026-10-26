@@ -364,6 +364,9 @@
       await callApi(api?.hide());
     });
     $("#welcomePrivacyBtn").addEventListener("click", () => callApi(api?.openPrivacy()));
+    $("#moveOverlayTitle").addEventListener("click", () => callApi(api?.moveOverlay()));
+    $("#moveOverlayBtn").addEventListener("click", () => callApi(api?.moveOverlay()));
+    $("#resetOverlayBtn").addEventListener("click", () => callApi(api?.resetOverlayPosition()));
     $("#dataBtn").addEventListener("click", () => callApi(api?.openDataFolder()));
     $("#privacyBtn").addEventListener("click", () => callApi(api?.openPrivacy()));
     $("#quitBtn").addEventListener("click", () => {

@@ -189,3 +189,35 @@ body {
 }
 
 .journey-strip.is-paused { filter: saturate(0.62) brightness(0.8); }
+
+/* Move mode */
+body.is-moving .journey-shell,
+body.is-moving .journey-strip,
+body.is-moving .journey-strip * {
+  pointer-events: auto;
+  -webkit-app-region: drag;
+}
+
+body.is-moving .journey-strip {
+  cursor: grab;
+  outline: 1px dashed rgba(201, 239, 85, 0.85);
+  outline-offset: 2px;
+}
+
+body.is-moving::after {
+  content: "拖动窗口 · Esc 锁定";
+  position: fixed;
+  z-index: 20;
+  left: 50%;
+  bottom: 3px;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  border: 1px solid rgba(201, 239, 85, 0.32);
+  border-radius: 999px;
+  background: rgba(10, 16, 11, 0.86);
+  color: #d8ff63;
+  font-family: "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", sans-serif;
+  font-size: 9px;
+  white-space: nowrap;
+  pointer-events: none;
+}

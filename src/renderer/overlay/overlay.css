@@ -301,3 +301,35 @@ body[data-theme="light"] .pause-layer p { color: rgba(11, 13, 10, 0.52); }
 @media (prefers-reduced-motion: reduce) {
   .live-dot, .notice-dot { animation: none; }
 }
+
+/* Move mode: the window is temporarily interactive so the card can be dragged. */
+body.is-moving .overlay-shell,
+body.is-moving .garden-card,
+body.is-moving .garden-card * {
+  pointer-events: auto;
+  -webkit-app-region: drag;
+}
+
+body.is-moving .garden-card {
+  cursor: grab;
+  outline: 1px dashed rgba(201, 239, 85, 0.85);
+  outline-offset: 2px;
+}
+
+body.is-moving::after {
+  content: "拖动窗口 · Esc 锁定";
+  position: fixed;
+  z-index: 20;
+  left: 50%;
+  bottom: 3px;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  border: 1px solid rgba(201, 239, 85, 0.32);
+  border-radius: 999px;
+  background: rgba(10, 16, 11, 0.86);
+  color: #d8ff63;
+  font-family: "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", sans-serif;
+  font-size: 9px;
+  white-space: nowrap;
+  pointer-events: none;
+}

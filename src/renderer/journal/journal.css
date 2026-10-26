@@ -135,6 +135,19 @@ button { cursor: pointer; }
   -webkit-app-region: no-drag;
 }
 
+.title-move {
+  height: 28px;
+  padding: 0 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.52);
+  color: #5f6a5a;
+  font-size: 11px;
+  -webkit-app-region: no-drag;
+}
+
+.title-move:hover { color: var(--ink); border-color: #aeb9a4; background: #fff; }
+
 .win-btn {
   display: flex;
   align-items: center;

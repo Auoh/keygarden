@@ -45,6 +45,8 @@ let broadcastTimer = null;
 let fastBroadcastTimer = null;
 let hotkeyStatus = {};
 let captureTimer = null;
+let overlayMoveMode = false;
+let overlayMoveTimer = null;
 
 const gotLock = process.env.KEYGARDEN_CAPTURE === "1" ? true : app.requestSingleInstanceLock();
 if (!gotLock) {
@@ -157,16 +159,43 @@ function overlaySize() {
   return overlayMode() === "journey" ? { width: 1000, height: 240 } : { width: 260, height: 320 };
 }
 
+function clampOverlayBounds(bounds) {
+  const display = screen.getDisplayNearestPoint({
+    x: Math.round(bounds.x + bounds.width / 2),
+    y: Math.round(bounds.y + bounds.height / 2),
+  });
+  const area = display.workArea;
+  const width = Math.min(bounds.width, Math.max(320, area.width - 24));
+  const height = Math.min(bounds.height, area.height);
+  return {
+    width,
+    height,
+    x: Math.round(Math.max(area.x, Math.min(bounds.x, area.x + area.width - width))),
+    y: Math.round(Math.max(area.y, Math.min(bounds.y, area.y + area.height - height))),
+  };
+}
+
 function positionOverlay() {
   if (!overlayWindow || overlayWindow.isDestroyed()) return;
   const display = screen.getPrimaryDisplay();
   const { width, height } = overlaySize();
-  const safeWidth = Math.min(width, Math.max(320, display.workArea.width - 24));
-  const x = overlayMode() === "journey"
-    ? Math.round(display.workArea.x + (display.workArea.width - safeWidth) / 2)
-    : Math.round(display.workArea.x + display.workArea.width - safeWidth - 16);
-  const y = Math.round(display.workArea.y + display.workArea.height - height - 16);
-  overlayWindow.setBounds({ x, y, width: safeWidth, height });
+  const mode = overlayMode();
+  const saved = engine.getState().settings.overlayPositions?.[mode];
+  let bounds;
+  if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) {
+    bounds = clampOverlayBounds({ x: saved.x, y: saved.y, width, height });
+  } else {
+    const safeWidth = Math.min(width, Math.max(320, display.workArea.width - 24));
+    bounds = clampOverlayBounds({
+      width: safeWidth,
+      height,
+      x: mode === "journey"
+        ? display.workArea.x + (display.workArea.width - safeWidth) / 2
+        : display.workArea.x + display.workArea.width - safeWidth - 16,
+      y: display.workArea.y + display.workArea.height - height - 16,
+    });
+  }
+  overlayWindow.setBounds(bounds);
 }
 
 function createOverlayWindow() {
@@ -200,10 +229,16 @@ function createOverlayWindow() {
   overlayWindow.setMenuBarVisibility(false);
   overlayWindow.setVisibleOnAllWorkspaces(false);
   overlayWindow.setIgnoreMouseEvents(true, { forward: true });
-  overlayWindow.webContents.on("did-finish-load", () => sendOverlayState());
+  overlayWindow.webContents.on("did-finish-load", () => {
+    sendOverlayState();
+    if (overlayMoveMode) overlayWindow.webContents.send("overlay:move-mode", true);
+  });
   overlayWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   overlayWindow.on("closed", () => {
     overlayWindow = null;
+  });
+  overlayWindow.on("move", () => {
+    if (overlayMoveMode) saveOverlayPosition();
   });
   overlayWindow.loadFile(overlayRendererFile());
   positionOverlay();
@@ -215,9 +250,54 @@ function createOverlayWindow() {
 
 function refreshOverlayMode() {
   if (!overlayWindow || overlayWindow.isDestroyed()) return;
+  if (overlayMoveMode) setMoveMode(false);
   positionOverlay();
   overlayWindow.loadFile(overlayRendererFile());
   if (engine.getState().settings.overlayVisible) overlayWindow.showInactive();
+}
+
+function saveOverlayPosition() {
+  if (!overlayWindow || overlayWindow.isDestroyed() || !engine) return;
+  const [x, y] = overlayWindow.getPosition();
+  engine.setOverlayPosition(overlayMode(), { x, y });
+  scheduleSave();
+}
+
+function setMoveMode(enabled) {
+  if (!overlayWindow || overlayWindow.isDestroyed()) return;
+  if (enabled) {
+    if (overlayMoveMode) {
+      if (overlayMoveTimer) clearTimeout(overlayMoveTimer);
+      overlayMoveTimer = setTimeout(() => setMoveMode(false), 20000);
+      return;
+    }
+    if (!engine.getState().settings.overlayVisible) setOverlayVisible(true);
+    overlayMoveMode = true;
+    overlayWindow.setAlwaysOnTop(true, "floating");
+    overlayWindow.setFocusable(true);
+    overlayWindow.setMovable(true);
+    overlayWindow.setIgnoreMouseEvents(false);
+    overlayWindow.show();
+    overlayWindow.focus();
+    overlayWindow.webContents.send("overlay:move-mode", true);
+    overlayMoveTimer = setTimeout(() => setMoveMode(false), 20000);
+    updateTray();
+    log("overlay move mode on");
+    return;
+  }
+
+  if (!overlayMoveMode) return;
+  overlayMoveMode = false;
+  if (overlayMoveTimer) clearTimeout(overlayMoveTimer);
+  overlayMoveTimer = null;
+  saveOverlayPosition();
+  overlayWindow.webContents.send("overlay:move-mode", false);
+  overlayWindow.setMovable(false);
+  overlayWindow.setFocusable(false);
+  overlayWindow.setIgnoreMouseEvents(true, { forward: true });
+  overlayWindow.setAlwaysOnTop(false);
+  updateTray();
+  log("overlay move mode off");
 }
 
 function createJournalWindow() {
@@ -263,6 +343,7 @@ function createJournalWindow() {
 }
 
 function showJournal({ fromTray = false } = {}) {
+  if (overlayMoveMode) setMoveMode(false);
   if (!journalWindow || journalWindow.isDestroyed()) createJournalWindow();
   if (journalWindow.isMinimized()) journalWindow.restore();
   journalWindow.show();
@@ -281,6 +362,7 @@ function hideJournal() {
 }
 
 function setOverlayVisible(visible, { save = true } = {}) {
+  if (!visible && overlayMoveMode) setMoveMode(false);
   engine.setOverlayVisible(visible);
   if (overlayWindow && !overlayWindow.isDestroyed()) {
     if (visible) overlayWindow.showInactive();
@@ -339,10 +421,22 @@ function buildTrayMenu() {
     },
     { type: "separator" },
     {
-      label: "角落花园",
+      label: "显示花园",
       type: "checkbox",
       checked: overlayVisible,
       click: () => setOverlayVisible(!overlayVisible),
+    },
+    {
+      label: overlayMoveMode ? "锁定窗口" : "移动窗口（20 秒）",
+      click: () => setMoveMode(!overlayMoveMode),
+    },
+    {
+      label: "重置窗口位置",
+      click: () => {
+        engine.resetOverlayPositions();
+        positionOverlay();
+        scheduleSave();
+      },
     },
     {
       label: paused ? "继续记录" : "暂停记录",
@@ -449,6 +543,17 @@ function bindIpc() {
     if (!fs.existsSync(privacyPath)) return "missing";
     return shell.openPath(privacyPath);
   });
+  ipcMain.handle("app:move-overlay", () => {
+    hideJournal();
+    setMoveMode(true);
+    return { ok: true };
+  });
+  ipcMain.handle("app:reset-overlay-position", () => {
+    engine.resetOverlayPositions();
+    positionOverlay();
+    scheduleSave();
+    return { ok: true };
+  });
   ipcMain.handle("app:set-mode", (_event, mode) => {
     if (mode !== "garden" && mode !== "journey") {
       const candidate = MODES.find((item) => item.id === mode);
@@ -471,6 +576,7 @@ function bindIpc() {
     app.quit();
   });
   ipcMain.on("overlay:ready", () => sendOverlayState());
+  ipcMain.on("overlay:move-end", () => setMoveMode(false));
 }
 
 function setupPowerEvents() {

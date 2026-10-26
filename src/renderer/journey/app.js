@@ -70,6 +70,9 @@
 
   if (bridge) {
     bridge.onState(applyState);
+    bridge.onMoveMode?.((moving) => {
+      document.body.classList.toggle("is-moving", moving);
+    });
     bridge
       .getState()
       .then((state) => {
@@ -92,6 +95,14 @@
       });
     }, 2400);
   }
+
+  document.addEventListener("keydown", (event) => {
+    if (!document.body.classList.contains("is-moving")) return;
+    if (event.key === "Escape" || event.key === "Enter") {
+      event.preventDefault();
+      bridge?.endMoveMode?.();
+    }
+  });
 
   window.__keygardenJourney = { applyState };
 })();
