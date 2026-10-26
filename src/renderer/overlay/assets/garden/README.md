@@ -40,7 +40,10 @@ So you only need to generate one theme. If both are present, light wins.
   220×280 with `object-fit: cover`
 - sRGB, JPEG quality 90+
 
-The prompt sheet is at [`docs/garden-image-prompts.md`](../../../../../docs/garden-image-prompts.md).
+Per-image prompts (one complete standalone prompt per plate):
+
+- Index: [`docs/garden-image-prompts.md`](../../../../../docs/garden-image-prompts.md)
+- Single-image files: [`docs/prompts/`](../../../../../docs/prompts/) — `01-light-stage-0.md` … `10-dark-stage-4.md`
 
 ## Placeholder credits
 

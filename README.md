@@ -63,6 +63,7 @@ B 的实现说明：[Mode B · 桌边远行](docs/mode-b.md)
 
 - 放到：`src/renderer/overlay/assets/garden/light/stage-0.jpg` … `stage-4.jpg`（或 `dark/`）
 - 规格与提示词：[docs/garden-image-prompts.md](docs/garden-image-prompts.md)
+- 每张图单独一条完整提示词：[docs/prompts/](docs/prompts/)（图 01–10）
 - 素材说明：[src/renderer/overlay/assets/garden/README.md](src/renderer/overlay/assets/garden/README.md)
 - 只做一套主题也可以；两套都有时默认浅色
 
