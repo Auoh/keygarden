@@ -16,11 +16,11 @@
 | P0 | 营地坐姿 | `traveler/camp-sit.png` | 扎营后坐在火边，营地不再空 | 推荐 |
 | P1 | 短休息 | `traveler/rest.png` | 停止输入 20 秒～5 分钟，尚未扎营 | 推荐 |
 | P2 | 到达地标 | `traveler/arrive.png` | 路段进度 90%～100%，到达下一站 | 可选 |
-| P2 | 雨天行走 | `traveler/rain.png` | 雨天，略微缩肩、压低重心 | 可选 |
+| P2 | 雨天行走 | `traveler/walk-rain.png` | 雨天，略微缩肩、压低重心 | 可选 |
 
 **结论：** 当前主循环最低只需要 `walk` + 营地；但要让“他在赶路”这件事成立，最值得补的是 **walk-b（步态）** 和 **camp-sit（营地有人）**。`rest` 次之，`arrive` / `rain` 属于锦上添花。
 
-> 现在代码只加载 `walk.png` 和 `camp.png`。上面的新状态图产好后，我再把画布状态机接上：行走交替、停留/扎营切换、到站停顿。
+> 代码现已接上 5 个状态：行走双帧、休息、到达、雨天、营地坐姿。图片缺失时会保持上一状态或退回代码绘制的小人。
 
 ---
 
@@ -47,7 +47,7 @@ photorealistic, 3D render, colored clothing, visible face, facial features, skin
 
 ## P0 · 行走第二帧 `walk-b.png`
 
-用途：和 `walk.png` 每 0.28～0.35 秒交替一次。两张图的**脚底位置、角色高度、背包和帽子**必须完全一致，只换腿和手臂。
+用途：和 `walk.png` 每 0.42 秒交替一次。两张图的**脚底位置、角色高度、背包和帽子**必须完全一致，只换腿和手臂。
 
 ```text
 A single full-body side-view silhouette of the same traveler as the reference image: a slim hiker facing right, black matte silhouette (#0A0B0C), thin warm amber rim light (#D9A05B) only along the top and back edges of the cap, backpack, shoulders, arms, legs and trekking pole, no facial features, no interior detail, no texture, no cast shadow, no ground, clean vector-like edges, transparent background, 1024x1024, character occupies about 78% of the frame height, feet near the bottom margin, centered.
@@ -97,7 +97,7 @@ Pose: standing at the crest of a small rise, side view facing right, chest open,
 
 ---
 
-## P2 · 雨天行走 `rain.png`（可选）
+## P2 · 雨天行走 `walk-rain.png`（可选）
 
 用途：雨天。若不想增加一张图，也可以用现有 `walk.png` + 画布雨丝/压暗层，不一定要新图。
 
@@ -114,7 +114,7 @@ Pose: walking to the right through rain, shoulders slightly hunched, head lowere
 1. 先用 `walk.png` 做 **image-to-image / character reference**，强度 0.35～0.5，保持剪影、背包、帽子、杖长不变
 2. 先出 `walk-b`，确认与 `walk` 的脚底、头高、背包轮廓对齐
 3. 再出 `camp-sit`（姿态变化最大，但身份特征要保留）
-4. 最后出 `rest`；`arrive` / `rain` 有余力再做
+4. 最后出 `rest`；`arrive` / `walk-rain` 有余力再做
 5. 每张都输出绿幕版；抠图后检查边缘有没有绿边/白边
 6. 所有图统一裁到角色外接框 + 8% 留白，保持脚底对齐
 
@@ -127,17 +127,17 @@ src/renderer/journey/assets/traveler/
   rest.png        # 新
   camp-sit.png    # 新
   arrive.png      # 可选
-  rain.png        # 可选
+  walk-rain.png   # 可选
 ```
 
 ## 代码接入
 
 接入时只改 `src/renderer/journey/journey-canvas.js` 的 `drawTraveler()`：
 
-- 行走：`walk` / `walk-b` 按时间交替
+- 行走：`walk` / `walk-b` 按时间交替（约 0.42 秒换一帧）
 - 短休息：`rest`
 - 扎营：`camp` + `camp-sit`
 - 到站：`arrive`
-- 天气：`rain`，没有则继续用 `walk`
+- 天气：`walk-rain`，没有则继续用 `walk`
 
 所有状态图都是可选的；文件缺失时继续用 `walk.png` 或代码剪影回退。位置仍由路段进度控制，不会因为换状态而回到固定点。

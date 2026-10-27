@@ -243,9 +243,25 @@
     ctx.fill();
   }
 
+  function drawFootShadow(ctx, x, baseY, width, alpha = 0.3) {
+    ctx.save();
+    ctx.translate(x, baseY);
+    ctx.scale(1, 0.16);
+    const shadow = ctx.createRadialGradient(0, 0, 1, 0, 0, width);
+    shadow.addColorStop(0, `rgba(2, 7, 8, ${alpha})`);
+    shadow.addColorStop(0.7, `rgba(2, 7, 8, ${alpha * 0.45})`);
+    shadow.addColorStop(1, "rgba(2, 7, 8, 0)");
+    ctx.fillStyle = shadow;
+    ctx.beginPath();
+    ctx.arc(0, 0, width, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
   function drawTraveler(ctx, state, time, assets) {
     const camped = Boolean(state.camped) || Boolean(state.runtime?.autoPaused) || Boolean(state.runtime?.paused);
     const progress = clamp(state.leg?.progress || 0, 0, 1);
+    const idleMs = Number(state.idleMs) || 0;
     // Walk the character across the strip as the leg advances, instead of
     // pinning them to one spot for the whole journey.
     const travelX = 236 + progress * 488;
@@ -271,15 +287,58 @@
       ctx.globalAlpha = 0.96;
       ctx.drawImage(image, x, y, width, height);
       ctx.restore();
+
+      if (assets.campSit) {
+        // The seated cutout includes its own log, so keep it in front of the
+        // tent and let the log provide the ground contact.
+        const sitHeight = 48;
+        const sitWidth = assets.campSit.width / assets.campSit.height * sitHeight;
+        const sitX = travelX - 46;
+        ctx.save();
+        ctx.translate(sitX, 176);
+        ctx.scale(1, 0.1);
+        const sitShadow = ctx.createRadialGradient(0, 0, 5, 0, 0, sitWidth * 0.68);
+        sitShadow.addColorStop(0, "rgba(2, 7, 8, 0.48)");
+        sitShadow.addColorStop(1, "rgba(2, 7, 8, 0)");
+        ctx.fillStyle = sitShadow;
+        ctx.beginPath();
+        ctx.arc(0, 0, sitWidth * 0.68, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.globalAlpha = 0.98;
+        ctx.drawImage(
+          assets.campSit,
+          sitX - sitWidth / 2,
+          176 - sitHeight,
+          sitWidth,
+          sitHeight,
+        );
+        ctx.restore();
+      }
       return;
     }
+
     if (!camped && assets?.traveler) {
-      const image = assets.traveler;
+      let image = assets.traveler;
+      // A leg's last stretch uses the arrival pose; a long pause uses the
+      // resting pose. Both are optional, so older asset folders still work.
+      if (idleMs >= 20000 && idleMs < 5 * 60 * 1000 && assets.rest) {
+        image = assets.rest;
+      } else if (progress >= 0.9 && assets.arrive) {
+        image = assets.arrive;
+      } else if (state.weather?.key === "rain" && assets.walkRain) {
+        image = assets.walkRain;
+      } else if (assets.walkB) {
+        const frame = Math.floor(time * 2.4) % 2 === 0 ? assets.walkB : assets.traveler;
+        image = frame || assets.walkB;
+      }
       const height = 54;
       const width = image.width / image.height * height;
-      const stride = Math.sin(time * 4.2);
-      const bob = stride * 1.2;
-      const lean = stride * 0.012;
+      const stride = state.weather?.key === "rain" ? Math.sin(time * 5.6) : Math.sin(time * 4.2);
+      const bob = image === assets.rest || image === assets.arrive ? 0 : stride * 1.2;
+      const lean = image === assets.rest || image === assets.arrive ? 0 : stride * 0.012;
+      drawFootShadow(ctx, travelX, 176, width * 0.72, image === assets.rest ? 0.2 : 0.3);
       ctx.save();
       ctx.translate(travelX, 176 + bob);
       ctx.rotate(lean);
@@ -422,7 +481,15 @@
     let last = 0;
     let start = 0;
     const backgrounds = [];
-    const assets = { traveler: null, camp: null };
+    const assets = {
+      traveler: null,
+      walkB: null,
+      rest: null,
+      campSit: null,
+      arrive: null,
+      walkRain: null,
+      camp: null,
+    };
 
     function resize() {
       dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -476,6 +543,11 @@
         backgrounds[index] = await loadStage(`assets/backgrounds/${LEG_FILES[index]}`);
       }
       assets.traveler = await loadStage("assets/traveler/walk");
+      assets.walkB = await loadStage("assets/traveler/walk-b");
+      assets.rest = await loadStage("assets/traveler/rest");
+      assets.campSit = await loadStage("assets/traveler/camp-sit");
+      assets.arrive = await loadStage("assets/traveler/arrive");
+      assets.walkRain = await loadStage("assets/traveler/walk-rain");
       assets.camp = await loadStage("assets/props/camp");
     })();
 

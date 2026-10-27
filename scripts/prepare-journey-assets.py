@@ -54,8 +54,8 @@ def crop_to_alpha(image, pad=0.035):
     )
 
 
-def cutout_traveler():
-    image = Image.open(SOURCE / "walk.jpg").convert("RGB")
+def cutout_green(source_path):
+    image = Image.open(source_path).convert("RGB")
     rgb = np.asarray(image).astype(np.float32)
     red, green, blue = rgb[..., 0], rgb[..., 1], rgb[..., 2]
     # Green screen: G is far above R/B on the background, never on the figure.
@@ -65,9 +65,47 @@ def cutout_traveler():
     mask = mask.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(0.5))
     result = image.convert("RGBA")
     result.putalpha(mask)
-    result = crop_to_alpha(result)
+    return crop_to_alpha(result)
+
+
+def cutout_white(source_path):
+    image = Image.open(source_path).convert("RGB")
+    # Some models add a thin dark frame around the bitmap; drop it first.
+    image = image.crop((3, 3, image.width - 3, image.height - 3))
+    rgb = np.asarray(image).astype(np.float32)
+    mx, mn = rgb.max(2), rgb.min(2)
+    saturation = mx - mn
+    luma = rgb[..., 0] * 0.299 + rgb[..., 1] * 0.587 + rgb[..., 2] * 0.114
+    # The figure is near-black or warm/saturated; the paper is bright and
+    # almost neutral. This also disposes of the thin border.
+    alpha = np.maximum(smoothstep(saturation, 4, 18), smoothstep(235 - luma, 0, 40))
+    mask = Image.fromarray((alpha * 255).astype(np.uint8), "L")
+    mask = mask.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(0.5))
+    result = image.convert("RGBA")
+    result.putalpha(mask)
+    return crop_to_alpha(result)
+
+
+def cutout_traveler():
+    result = cutout_green(SOURCE / "walk.jpg")
     result.save(ASSETS / "traveler" / "walk.png", optimize=True)
     return result.size
+
+
+def cutout_traveler_states():
+    states = [
+        ("walk-b.jpg", "walk-b.png", cutout_white),
+        ("rest.jpg", "rest.png", cutout_green),
+        ("camp-sit.jpg", "camp-sit.png", cutout_green),
+        ("arrive.jpg", "arrive.png", cutout_green),
+        ("walk-rain.jpg", "walk-rain.png", cutout_green),
+    ]
+    for source_name, output_name, cutter in states:
+        result = cutter(SOURCE / "traveler" / source_name)
+        # Keep every state aligned to the same character height in the canvas:
+        # the alpha crop already removes the source margin.
+        result.save(ASSETS / "traveler" / output_name, optimize=True)
+        print(f"traveler state {output_name}: {result.size}")
 
 
 def cutout_camp():
@@ -119,6 +157,7 @@ def main():
         print(f"background {output_name}: {plate.size} (source top {top})")
 
     print("traveler", cutout_traveler())
+    cutout_traveler_states()
     print("camp", cutout_camp())
 
 

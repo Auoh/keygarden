@@ -31,13 +31,32 @@ The renderer crossfades to the next plate near the end of a leg.
 ## Props
 
 ```
-traveler/walk.png    # walking traveler cutout, 369×655
-props/camp.png       # tent + campfire cutout, 1028×495
+traveler/walk.png       # walking traveler cutout, 369×655
+traveler/walk-b.png     # second walking frame, 560×998
+traveler/rest.png       # standing rest pose, 531×939
+traveler/arrive.png     # arrival pose, 416×893
+traveler/walk-rain.png  # rain-coat walking pose, 554×911
+props/camp.png          # tent + campfire cutout, 1028×495
+traveler/camp-sit.png   # seated traveler with log, 762×928
 ```
 
-The supplied `walk.jpg` / `camp.jpg` were chroma/white-background images, so
-the PNGs here are cutouts with their backgrounds removed. If they are missing,
-the original silhouette traveler / code-drawn tent is used.
+The supplied `walk.jpg` / `camp.jpg` and the five state JPGs are
+chroma/white-background images. The PNGs here are alpha cutouts with their
+backgrounds removed; the originals live in
+[`docs/journey-source/traveler/`](../../../../docs/journey-source/traveler/)
+and can be rebuilt with `scripts/prepare-journey-assets.py`.
+
+Runtime selection:
+
+- walking: `walk.png` and `walk-b.png` alternate every ~0.42s
+- resting: `rest.png` after 20s without keys (but before the 5min camp)
+- arriving: `arrive.png` at 90% of a leg
+- rain: `walk-rain.png` when the current weather is rain
+- camp: `camp.png` plus `camp-sit.png`, with the seated figure in front of the tent
+
+If any file is missing, the renderer keeps the previous image or falls back to
+the original silhouette traveler / code-drawn tent. Adding a replacement with
+the same filename requires no code change.
 
 ## Prompt pack
 

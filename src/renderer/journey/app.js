@@ -37,7 +37,7 @@
     else if (!state.today?.keys && !state.totalDistanceM) status.textContent = "等待出发";
     else if (state.camped) status.textContent = "扎营";
     else if (state.weather?.key === "rain") status.textContent = "雨里赶路";
-    else if ((state.idleMs || 0) > 10 * 60 * 1000) status.textContent = "停一会儿";
+    else if ((state.idleMs || 0) >= 20000) status.textContent = "停一会儿";
     else status.textContent = "正在赶路";
   }
 
