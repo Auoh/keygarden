@@ -28,7 +28,7 @@
 - 手帐里的 **Mode B / DESKBOUND** 面板显示今日路程、总路程、纪念品和最近一张旅行明信片
 - 手帐面板上的按钮可以直接在 A / B 之间切换
 - 原来的“游戏模式”卡片里，B 已从 `SOON` 改为 `可切换`
-- 已接入 6 张 24:5 风景背景（原图 2.35:1，按场景焦点裁切）、旅人 `walk.png` 和营地 `camp.png` 透明贴图；提示词见 [journey-image-prompts.md](journey-image-prompts.md)，放置路径见 [assets/README.md](../src/renderer/journey/assets/README.md)
+- 已接入 6 张 24:5 风景背景（原图 2.35:1，按场景焦点裁切）、旅人 `walk.png` 和营地 `camp.png` 透明贴图；提示词见 [journey-image-prompts.md](journey-image-prompts.md)，一致性审计与修复提示词见 [asset-audit-2026-10-27.md](asset-audit-2026-10-27.md)，放置路径见 [assets/README.md](../src/renderer/journey/assets/README.md)
 - 旅人现在有 5 个状态：两帧行走（`walk` / `walk-b`）、休息、到达、雨天、营地坐姿。状态按下面的规则切换，不是随机播放
 
 | 状态 | 触发条件 | 表现 |

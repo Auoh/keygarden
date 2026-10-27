@@ -35,7 +35,9 @@ src/renderer/overlay/assets/garden/
 
 ## 一致性规则
 
-10 张里同一个主题的 5 张，必须是同一个瓶子、同一张桌面、同一个机位、同一束光。先生成 `stage-4` 作为主参考，再用图生图依次做 `stage-3 → stage-2 → stage-1 → stage-0`；每张只改植物密度，强调：
+> **2026-10-27 审计补充：** 当前浅色 `stage-4` 与 0–3 的瓶子大小、桌面和背景不一致。**不要再用当前这张 stage-4 当主参考**。请以 `light/stage-3.jpg` 为参考，只对瓶内植物做局部重绘；修复提示词和蒙版流程见 [asset-audit-2026-10-27.md](asset-audit-2026-10-27.md)。
+
+10 张里同一个主题的 5 张，必须是同一个瓶子、同一张桌面、同一个机位、同一束光。先生成一张被批准的 `stage-3` 作为主参考，再用图生图依次做 `stage-2 → stage-1 → stage-0`，最后从 `stage-3` 往 `stage-4` 做局部重绘；每张只改植物密度，强调：
 
 `same jar, same table, same camera, same lighting, same composition; only the plant density changes.`
 
@@ -51,13 +53,13 @@ src/renderer/overlay/assets/garden/
 ### 正向提示词（复制这一段）
 
 ```text
-Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 2:3 composition. The jar sits on a pale plaster stone surface in a bright, airy studio. Inside: living green moss, miniature ferns, mossy stones and a few small plants. Soft warm morning side light, translucent glass with clean highlights, pale sage and lime greens, subtle natural shadows, shallow depth of field, fine film grain, calm editorial color grading. Camera at eye level, straight-on, slightly above the jar, centered composition, the whole jar visible, generous negative space at the top and bottom. No person, no hands, no text, no logo, no UI, no border, no watermark. Newly planted. About 70% bare dark soil, only a few small moss patches, two tiny sprouts with thin stems and one closed bud. No open flowers, no mushroom. Very sparse, fragile, just after planting. Same jar, same table, same camera, same light.
+Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 2:3 composition. The jar sits on a dark charcoal slate table in a bright, airy studio, with a softly blurred window and green plants behind it. Inside: living green moss, miniature ferns, mossy stones and a few small plants. Soft warm morning side light, translucent glass with clean highlights, pale sage and lime greens, subtle natural shadows, shallow depth of field, fine film grain, calm editorial color grading. Camera at eye level, straight-on, slightly above the jar, centered composition, the whole jar visible, generous negative space at the top and bottom. No person, no hands, no text, no logo, no UI, no border, no watermark. Newly planted. About 70% bare dark soil, only a few small moss patches, two tiny sprouts with thin stems and one closed bud. No open flowers, no mushroom. Very sparse, fragile, just after planting. Same jar, same table, same camera, same light.
 ```
 
 ### 负向提示词（单独填，或接在正向后面）
 
 ```text
-text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
+text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, pale plaster table, white stone table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
 ```
 
 > 单图文件：[prompts/01-light-stage-0.md](prompts/01-light-stage-0.md)
@@ -70,13 +72,13 @@ text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, 
 ### 正向提示词（复制这一段）
 
 ```text
-Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 2:3 composition. The jar sits on a pale plaster stone surface in a bright, airy studio. Inside: living green moss, miniature ferns, mossy stones and a few small plants. Soft warm morning side light, translucent glass with clean highlights, pale sage and lime greens, subtle natural shadows, shallow depth of field, fine film grain, calm editorial color grading. Camera at eye level, straight-on, slightly above the jar, centered composition, the whole jar visible, generous negative space at the top and bottom. No person, no hands, no text, no logo, no UI, no border, no watermark. Young. Moss is spreading across the soil, a few small fern fiddleheads are unfurling, one tiny mushroom and one closed flower bud are visible. Sparse but alive. Same jar, same table, same camera, same light.
+Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 2:3 composition. The jar sits on a dark charcoal slate table in a bright, airy studio, with a softly blurred window and green plants behind it. Inside: living green moss, miniature ferns, mossy stones and a few small plants. Soft warm morning side light, translucent glass with clean highlights, pale sage and lime greens, subtle natural shadows, shallow depth of field, fine film grain, calm editorial color grading. Camera at eye level, straight-on, slightly above the jar, centered composition, the whole jar visible, generous negative space at the top and bottom. No person, no hands, no text, no logo, no UI, no border, no watermark. Young. Moss is spreading across the soil, a few small fern fiddleheads are unfurling, one tiny mushroom and one closed flower bud are visible. Sparse but alive. Same jar, same table, same camera, same light.
 ```
 
 ### 负向提示词（单独填，或接在正向后面）
 
 ```text
-text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
+text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, pale plaster table, white stone table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
 ```
 
 > 单图文件：[prompts/02-light-stage-1.md](prompts/02-light-stage-1.md)
@@ -89,13 +91,13 @@ text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, 
 ### 正向提示词（复制这一段）
 
 ```text
-Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 2:3 composition. The jar sits on a pale plaster stone surface in a bright, airy studio. Inside: living green moss, miniature ferns, mossy stones and a few small plants. Soft warm morning side light, translucent glass with clean highlights, pale sage and lime greens, subtle natural shadows, shallow depth of field, fine film grain, calm editorial color grading. Camera at eye level, straight-on, slightly above the jar, centered composition, the whole jar visible, generous negative space at the top and bottom. No person, no hands, no text, no logo, no UI, no border, no watermark. Establishing. A moss carpet covers about half of the floor, ferns are opening, one small flower is open, one mushroom is visible. Medium density. Same jar, same table, same camera, same light.
+Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 2:3 composition. The jar sits on a dark charcoal slate table in a bright, airy studio, with a softly blurred window and green plants behind it. Inside: living green moss, miniature ferns, mossy stones and a few small plants. Soft warm morning side light, translucent glass with clean highlights, pale sage and lime greens, subtle natural shadows, shallow depth of field, fine film grain, calm editorial color grading. Camera at eye level, straight-on, slightly above the jar, centered composition, the whole jar visible, generous negative space at the top and bottom. No person, no hands, no text, no logo, no UI, no border, no watermark. Establishing. A moss carpet covers about half of the floor, ferns are opening, one small flower is open, one mushroom is visible. Medium density. Same jar, same table, same camera, same light.
 ```
 
 ### 负向提示词（单独填，或接在正向后面）
 
 ```text
-text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
+text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, pale plaster table, white stone table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
 ```
 
 > 单图文件：[prompts/03-light-stage-2.md](prompts/03-light-stage-2.md)
@@ -108,13 +110,13 @@ text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, 
 ### 正向提示词（复制这一段）
 
 ```text
-Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 2:3 composition. The jar sits on a pale plaster stone surface in a bright, airy studio. Inside: living green moss, miniature ferns, mossy stones and a few small plants. Soft warm morning side light, translucent glass with clean highlights, pale sage and lime greens, subtle natural shadows, shallow depth of field, fine film grain, calm editorial color grading. Camera at eye level, straight-on, slightly above the jar, centered composition, the whole jar visible, generous negative space at the top and bottom. No person, no hands, no text, no logo, no UI, no border, no watermark. Lush. Dense moss carpet, layered ferns, several mushrooms and flowers, dew on the leaves, light condensation on the glass. Rich and healthy. Same jar, same table, same camera, same light.
+Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 2:3 composition. The jar sits on a dark charcoal slate table in a bright, airy studio, with a softly blurred window and green plants behind it. Inside: living green moss, miniature ferns, mossy stones and a few small plants. Soft warm morning side light, translucent glass with clean highlights, pale sage and lime greens, subtle natural shadows, shallow depth of field, fine film grain, calm editorial color grading. Camera at eye level, straight-on, slightly above the jar, centered composition, the whole jar visible, generous negative space at the top and bottom. No person, no hands, no text, no logo, no UI, no border, no watermark. Lush. Dense moss carpet, layered ferns, several mushrooms and flowers, dew on the leaves, light condensation on the glass. Rich and healthy. Same jar, same table, same camera, same light.
 ```
 
 ### 负向提示词（单独填，或接在正向后面）
 
 ```text
-text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
+text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, pale plaster table, white stone table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
 ```
 
 > 单图文件：[prompts/04-light-stage-3.md](prompts/04-light-stage-3.md)
@@ -127,13 +129,15 @@ text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, 
 ### 正向提示词（复制这一段）
 
 ```text
-Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 2:3 composition. The jar sits on a pale plaster stone surface in a bright, airy studio. Inside: living green moss, miniature ferns, mossy stones and a few small plants. Soft warm morning side light, translucent glass with clean highlights, pale sage and lime greens, subtle natural shadows, shallow depth of field, fine film grain, calm editorial color grading. Camera at eye level, straight-on, slightly above the jar, centered composition, the whole jar visible, generous negative space at the top and bottom. No person, no hands, no text, no logo, no UI, no border, no watermark. Fully grown. Very lush layered terrarium, ferns at different heights, moss covering the floor, several flowers and mushrooms, heavy dew and condensation, two or three tiny fireflies. Cinematic and alive, still the same jar and camera.
+Use the attached light/stage-3.jpg as the exact reference image. Keep the glass jar, cork lid, camera distance, framing, dark charcoal slate table, softly blurred window and green plant background, side-light direction, shadows, color grade, depth of field and film grain 100% unchanged. Only repaint the interior of the jar: a fully grown, lush terrarium with a dense moss floor, taller layered ferns, small pale pink and white flowers, three or four small brown mushrooms, dew on leaves, light condensation on the inside of the glass, and two or three tiny warm fireflies. Keep every plant below the jar shoulder and inside the glass; do not change the jar silhouette, cork, table, backdrop or camera. Photorealistic macro photograph, vertical 2:3, 848x1264, same lens and exposure as the reference.
 ```
+
+**这一张必须用参考图/局部重绘，不能只靠文字重新生成。** 以 `light/stage-3.jpg` 为底，只在瓶内做蒙版，denoise 0.45–0.55；瓶外像素原样保留。完整流程见 [asset-audit-2026-10-27.md](asset-audit-2026-10-27.md)。
 
 ### 负向提示词（单独填，或接在正向后面）
 
 ```text
-text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
+text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, pale plaster table, white stone table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
 ```
 
 > 单图文件：[prompts/05-light-stage-4.md](prompts/05-light-stage-4.md)
@@ -152,7 +156,7 @@ Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 
 ### 负向提示词（单独填，或接在正向后面）
 
 ```text
-text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
+text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, pale plaster table, white stone table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
 ```
 
 > 单图文件：[prompts/06-dark-stage-0.md](prompts/06-dark-stage-0.md)
@@ -171,7 +175,7 @@ Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 
 ### 负向提示词（单独填，或接在正向后面）
 
 ```text
-text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
+text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, pale plaster table, white stone table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
 ```
 
 > 单图文件：[prompts/07-dark-stage-1.md](prompts/07-dark-stage-1.md)
@@ -190,7 +194,7 @@ Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 
 ### 负向提示词（单独填，或接在正向后面）
 
 ```text
-text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
+text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, pale plaster table, white stone table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
 ```
 
 > 单图文件：[prompts/08-dark-stage-2.md](prompts/08-dark-stage-2.md)
@@ -209,7 +213,7 @@ Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 
 ### 负向提示词（单独填，或接在正向后面）
 
 ```text
-text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
+text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, pale plaster table, white stone table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
 ```
 
 > 单图文件：[prompts/09-dark-stage-3.md](prompts/09-dark-stage-3.md)
@@ -228,7 +232,7 @@ Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 
 ### 负向提示词（单独填，或接在正向后面）
 
 ```text
-text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
+text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, different jar, different table, pale plaster table, white stone table, different camera angle, top-down view, hands, person, cartoon, illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, deformed leaves
 ```
 
 > 单图文件：[prompts/10-dark-stage-4.md](prompts/10-dark-stage-4.md)

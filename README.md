@@ -41,7 +41,7 @@ B 的实现说明：[Mode B · 桌边远行](docs/mode-b.md)
 
 你工作，他赶路；你停下，他扎营。手帐里的 Mode B 面板可以直接切换到这条底部风景带。实现说明见 [docs/mode-b.md](docs/mode-b.md)。
 
-B 的美术提示词：[背景/旅人/营地](docs/journey-image-prompts.md)、[5 个角色状态](docs/journey-character-prompts.md)。背景、行走帧、休息/到达/雨天/扎营坐姿都已接入；只有素材缺失时才退回代码绘制的风景和小人。
+B 的美术提示词：[背景/旅人/营地](docs/journey-image-prompts.md)、[5 个角色状态](docs/journey-character-prompts.md)。一致性问题与参考图锁定流程见 [贴图审计](docs/asset-audit-2026-10-27.md)。背景、行走帧、休息/到达/雨天/扎营坐姿都已接入；只有素材缺失时才退回代码绘制的风景和小人。
 
 ## 功能
 
@@ -73,6 +73,7 @@ B 的美术提示词：[背景/旅人/营地](docs/journey-image-prompts.md)、[
 - 主题切换：手帐设置里的“界面主题”，或系统托盘 → 界面主题
 - 规格与提示词：[docs/garden-image-prompts.md](docs/garden-image-prompts.md)
 - 每张图单独一条完整提示词：[docs/prompts/](docs/prompts/)（图 01–10）
+- **浅色 stage-4 与 0–3 不一致，修复提示词见 [贴图审计](docs/asset-audit-2026-10-27.md)**
 - 素材说明：[src/renderer/overlay/assets/garden/README.md](src/renderer/overlay/assets/garden/README.md)
 - 只做一套主题也可以；两套都有时默认浅色
 

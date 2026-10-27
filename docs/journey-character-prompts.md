@@ -4,6 +4,8 @@
 
 现有的 `walk.png` 是基准：黑色剪影、暖琥珀色轮廓光、侧视、向右行走、背包 + 鸭舌帽 + 登山杖、没有五官和内部细节。下面的提示词全部以它为参考。
 
+> **2026-10-27 审计补充：** 这 5 张状态是分别生成的，`arrive` 更瘦、`walk-b` 背包更大、`camp-sit` 多出树桩和第二个背包。仅靠每张独立文字 prompt 无法锁住身份。请优先使用 [asset-audit-2026-10-27.md](asset-audit-2026-10-27.md) 的“六姿态角色设定图”流程：先批准一张同一角色、同一比例、同一脚底基线的设定图，再从它派生。下面的独立提示词只作为没有参考图时的兜底。
+
 ---
 
 ## 需要哪些状态
@@ -40,7 +42,7 @@
 ### 通用负面提示词
 
 ```text
-photorealistic, 3D render, colored clothing, visible face, facial features, skin, hair, extra limbs, extra fingers, different backpack, different hat, hood, umbrella, shadow, ground, floor, scenery, background gradient, text, watermark, frame, multiple characters, front view, three-quarter view, perspective, motion blur, soft blurry edges, white outline, gray fill, interior highlights, logo
+photorealistic, 3D render, colored clothing, visible face, facial features, skin, hair, extra limbs, extra fingers, different backpack, second backpack, extra bag, different hat, hood, umbrella, shadow, ground, floor, scenery, background gradient, text, watermark, frame, multiple characters, front view, three-quarter view, perspective, motion blur, soft blurry edges, white outline, gray fill, interior highlights, logo
 ```
 
 ---
@@ -66,7 +68,7 @@ Pose: the opposite walking stride to the reference — left leg forward and plan
 ```text
 A single full-body side-view silhouette of the same traveler as the reference image: a slim hiker facing right, black matte silhouette (#0A0B0C), thin warm amber rim light (#D9A05B) along the top and back edges of the cap, backpack, shoulders, arms, legs and trekking pole, no facial features, no interior detail, no texture, no cast shadow, no ground, clean vector-like edges, transparent background, 1024x1024, character occupies about 62% of the frame height, centered.
 
-Pose: seated on an unseen low log, side view facing right, knees bent and feet planted, forearms resting on the knees, leaning slightly forward toward a campfire off-frame at the right, trekking pole laid across the lap, backpack removed and leaning against the log behind the character. Same cap, same backpack shape, same boot shape, same body proportions. Relaxed, quiet, end-of-day posture; no standing, no walking.
+Pose: seated on a small low log, side view facing right, knees bent and feet planted, forearms resting on the knees, leaning slightly forward toward a campfire off-frame at the right, trekking pole laid across the lap, wearing the same single large backpack. Same cap, same backpack shape, same boot shape, same body proportions. Only one backpack: no second bag on the ground, no tent, no campfire, no ground plane. Relaxed, quiet, end-of-day posture; no standing, no walking.
 ```
 
 **合成建议：** 把人物底边对齐到营地火堆左侧，人物高度约为帐篷高度的 55～65%；不要让人物挡住火光。
