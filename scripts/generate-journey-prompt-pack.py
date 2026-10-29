@@ -1,7 +1,7 @@
 from pathlib import Path
 from textwrap import dedent
 
-ROOT = Path(r"D:\codex\keyboardgame")
+ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 PROMPTS = DOCS / "journey-prompts"
 
@@ -76,7 +76,7 @@ CAMP = (
     "A small side-view canvas tent and a low campfire, cinematic blue-hour palette, warm fire glow "
     "on the tent edge, isolated on a fully transparent background, PNG with alpha, 512×256, "
     "centered, no person, no ground plane, no long shadow, no text, no logo, no UI, clean cutout, "
-    "designed to sit on a blue-hour landscape at about 68 px tall."
+    "designed to sit on a blue-hour landscape at about 58 px tall."
 )
 
 
@@ -116,7 +116,7 @@ def prompt_files():
             "path": "props/camp.png",
             "positive": CAMP,
             "negative": NEGATIVE_SPRITE,
-            "spec": "512×256 or larger, transparent PNG. No person; the app draws it around 68 px tall.",
+            "spec": "512×256 or larger, transparent PNG. No person; the app draws it around 58 px tall.",
         }
     )
     return items

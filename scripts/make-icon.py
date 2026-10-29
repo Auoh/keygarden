@@ -2,7 +2,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter
 
-base = Path(r"D:\codex\keyboardgame\resources")
+base = Path(__file__).resolve().parent.parent / "resources"
 base.mkdir(parents=True, exist_ok=True)
 
 size = 512

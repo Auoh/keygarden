@@ -1,13 +1,13 @@
 from pathlib import Path
 from textwrap import dedent
 
-ROOT = Path(r"D:\codex\keyboardgame")
+ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 PROMPTS = DOCS / "prompts"
 
 LIGHT_STYLE = (
     "Photorealistic macro photograph of a small hand-blown glass terrarium, vertical 2:3 composition. "
-    "The jar sits on a pale plaster stone surface in a bright, airy studio. Inside: living green moss, "
+    "The jar sits on a dark charcoal slate table in a bright, airy studio, with a softly blurred window and green plants behind it. Inside: living green moss, "
     "miniature ferns, mossy stones and a few small plants. Soft warm morning side light, translucent "
     "glass with clean highlights, pale sage and lime greens, subtle natural shadows, shallow depth of "
     "field, fine film grain, calm editorial color grading. Camera at eye level, straight-on, slightly "
@@ -64,7 +64,7 @@ STAGES = [
 
 NEGATIVE = (
     "text, letters, numbers, logo, watermark, UI, interface, border, frame, collage, multiple jars, "
-    "different jar, different table, different camera angle, top-down view, hands, person, cartoon, "
+    "different jar, different table, pale plaster table, white stone table, different camera angle, top-down view, hands, person, cartoon, "
     "illustration, 3D render, plastic plant, toy, oversaturated, HDR, low resolution, blurry, "
     "deformed leaves"
 )
@@ -74,6 +74,18 @@ SPEC = (
     "The final overlay crops to 220×280, so keep the jar and plants inside the central 80%."
 )
 
+LIGHT_STAGE4_PROMPT = (
+    "Use the attached light/stage-3.jpg as the exact reference image. Keep the glass jar, cork lid, "
+    "camera distance, framing, dark charcoal slate table, softly blurred window and green plant "
+    "background, side-light direction, shadows, color grade, depth of field and film grain 100% "
+    "unchanged. Only repaint the interior of the jar: a fully grown, lush terrarium with a dense moss "
+    "floor, taller layered ferns, small pale pink and white flowers, three or four small brown "
+    "mushrooms, dew on leaves, light condensation on the inside of the glass, and two or three tiny "
+    "warm fireflies. Keep every plant below the jar shoulder and inside the glass; do not change the "
+    "jar silhouette, cork, table, backdrop or camera. Photorealistic macro photograph, vertical 2:3, "
+    "848x1264, same lens and exposure as the reference."
+)
+
 IMAGES = []
 for mode, style, theme_label in [
     ("light", LIGHT_STYLE, "浅色 · 晨光"),
@@ -81,6 +93,7 @@ for mode, style, theme_label in [
 ]:
     for stage, stage_label, stage_text in STAGES:
         index = len(IMAGES) + 1
+        prompt = LIGHT_STAGE4_PROMPT if mode == "light" and stage == "stage-4" else f"{style} {stage_text}"
         IMAGES.append(
             {
                 "index": index,
@@ -88,7 +101,7 @@ for mode, style, theme_label in [
                 "theme": theme_label,
                 "stage": stage,
                 "stage_label": stage_label,
-                "prompt": f"{style} {stage_text}",
+                "prompt": prompt,
                 "path": f"{mode}/{stage}.jpg",
                 "slug": f"{index:02d}-{mode}-{stage}",
             }

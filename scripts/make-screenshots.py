@@ -2,7 +2,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-root = Path(r"D:\codex\keyboardgame")
+root = Path(__file__).resolve().parent.parent
 final = root / "artifacts" / "final"
 docs = root / "docs" / "screenshots"
 docs.mkdir(parents=True, exist_ok=True)
