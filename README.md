@@ -10,6 +10,10 @@
 >
 > 体验流程与下一版改版提案（PPT）：[keygarden-A-flow.pptx](docs/keygarden-A-flow.pptx)
 
+## 下载
+
+Windows 10/11 x64 免安装版：[GitHub Releases](https://github.com/Auoh/keygarden/releases)。下载 zip 解压后运行 `Keygarden.exe`；首次运行会在 `%APPDATA%\keygarden` 创建本地存档。当前构建未做代码签名，Windows SmartScreen 可能提示“未知发布者”，选择“仍要运行”即可。
+
 ## 现在是什么状态
 
 **Mode A · 键息花园** 已实现并可运行。  
